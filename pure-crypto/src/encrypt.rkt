@@ -1,52 +1,58 @@
 #lang racket
 
+(require "lib/constants.rkt")
+(require "lib/lib.rkt")
+(require "lib/padding.rkt")
+(require "cipher/des.rkt")
+(require "share.rkt")
+
 (require file/sha1)
 (require net/base64)
 
 (provide (contract-out
-          [des (->* (string? string?)
+          [encrypt (->* (string? string?)
                     (
-                     #:type? (or/c 'des 'tdes)
+                     #:type? (or/c 'des 'tdes 'aes)
                      #:key_format? (or/c 'hex 'base64 'utf-8)
                      #:data_format? (or/c 'hex 'base64 'utf-8)
                      #:encrypted_format? (or/c 'hex 'base64)
                      #:padding_mode? (or/c 'pkcs5 'zero 'no-padding 'ansix923 'iso10126)
                      #:operation_mode? (or/c 'ecb 'cbc 'pcbc 'cfb 'ofb)
                      #:iv? string?
-                     #:express? boolean?
-                     #:express_path? path-string?
+                     #:detail? (or/c #f (listof (or/c 'raw 'console path-string?)))
                     )
                     string?)]
           ))
 
-(require "lib/constants.rkt")
-(require "lib/lib.rkt")
-(require "lib/padding.rkt")
-(require "express/express.rkt")
-(require "share.rkt")
-
-
-(define (des data key
-             #:type? [type? 'des]
-             #:key_format? [key_format? 'utf-8]
-             #:data_format? [data_format? 'utf-8]
-             #:encrypted_format? [encrypted_format? 'hex]
-             #:padding_mode? [padding_mode? 'pkcs5]
-             #:operation_mode? [operation_mode? 'cbc]
-             #:iv? [iv? "0000000000000000"]
-             #:express? [express? #f]
-             #:express_path? [express_path? ".des.express"]
-             )
-
-  (express
-   express?
+(define (encrypt 
+         data key
+         #:type? [type? 'des]
+         #:key_format? [key_format? 'utf-8]
+         #:data_format? [data_format? 'utf-8]
+         #:encrypted_format? [encrypted_format? 'hex]
+         #:padding_mode? [padding_mode? 'pkcs5]
+         #:operation_mode? [operation_mode? 'cbc]
+         #:iv? [iv? "0000000000000000"]
+         #:detail? [detail? #f]
+         )
+  (detail 
+   #:formats detail?
+   #:exception_value #f
    (lambda ()
-     (delete-directory/files #:must-exist? #f express_path?)
-     (make-directory* express_path?)))
 
-  (express express? (lambda () (write-report-header "DES/TDES/3DES/TDEA-Encryption" express_path?)))
+     (detail-h1 "Encryption Detail")
 
-  (define key_and_iv (process-key key iv? key_format? express? express_path?))
+     (define key_and_iv (process-key key iv? key_format?)
+        (printf "#lang scribble/base\n\n")
+        (printf "@title{Key And Iv[~a]}\n\n" key)
+        (printf "@section{Origin Key[~a]}\n" key)
+        (printf "[~a]\n" key)
+        (printf "@section{Key To Binary[~a]}\n\n" key)
+        (printf "length: ~a\n\n" (string-length key))
+        (printf (display-list key_b8_list 10))
+        (printf "@section{Origin Iv[~a]}\n\n" key)
+        (printf "[~a]\n\n" iv_bin)
+
   (define k_lists (car key_and_iv))
   (define iv_bin (cdr key_and_iv))
 

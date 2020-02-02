@@ -15,7 +15,7 @@
 (require "../lib/constants.rkt")
 (require "../lib/lib.rkt")
 
-(define (des key_list operated_binary_data)
+(define (des operated_binary_data key_list)
   (let* ([m0 operated_binary_data]
          [ip0 (transform-binary-string m0 *ip_table*)]
          [l0 (substring ip0 0 32)]
@@ -23,6 +23,7 @@
          [encrypted_block_binary_data #f])
 
     (detail-page
+     #:font_size 'small
      (lambda ()
        
        (detail-h3 "DES BLOCK DETAIL")
