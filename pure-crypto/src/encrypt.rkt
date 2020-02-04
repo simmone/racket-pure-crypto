@@ -3,6 +3,8 @@
 (require "lib/constants.rkt")
 (require "lib/lib.rkt")
 (require "lib/padding.rkt")
+(require "lib/process-key.rkt")
+(require "lib/process-data.rkt")
 (require "cipher/des.rkt")
 (require "share.rkt")
 
@@ -40,43 +42,41 @@
    #:exception_value #f
    (lambda ()
 
-     (detail-h1 "Encryption Detail")
+     (detail-page
+      (lambda ()
+        (detail-h1 "Encryption Detail")
 
-     (define key_and_iv (process-key key iv? key_format?)
-        (printf "#lang scribble/base\n\n")
-        (printf "@title{Key And Iv[~a]}\n\n" key)
-        (printf "@section{Origin Key[~a]}\n" key)
-        (printf "[~a]\n" key)
-        (printf "@section{Key To Binary[~a]}\n\n" key)
-        (printf "length: ~a\n\n" (string-length key))
-        (printf (display-list key_b8_list 10))
-        (printf "@section{Origin Iv[~a]}\n\n" key)
-        (printf "[~a]\n\n" iv_bin)
+        (define key_and_iv (process-key key #:iv? iv? #:key_format? key_format?))
 
-  (define k_lists (car key_and_iv))
-  (define iv_bin (cdr key_and_iv))
+        (define k_lists (car key_and_iv))
+        (define iv_bin (cdr key_and_iv))
 
-  (define hex_and_bits (process-data data data_format? padding_mode? operation_mode? express? express_path?))
-  (define hex_strs_after_padding (car hex_and_bits))
-  (define 64bits_blocks_after_padding (cdr hex_and_bits))
+        (define hex_and_bits 
+          (process-data
+           data
+           #:data_format? data_format?
+           #:padding_mode? padding_mode?
+           #:operation_mode? operation_mode?))
+        (define hex_strs_after_padding (car hex_and_bits))
+        (define 64bits_blocks_after_padding (cdr hex_and_bits))
 
-  (define reverse_ip_1_table (reverse-table *ip_1_table*))
-  (define reverse_ip_table (reverse-table *ip_table*))
+        (define reverse_ip_1_table (reverse-table *ip_1_table*))
+        (define reverse_ip_table (reverse-table *ip_table*))))
 
-  (express express? (lambda () (write-report-des-start *ip_table* *e_table* *ip_1_table* operation_mode? express_path?)))
+     (detail-page
+      (lambda ()
+        (detail-h2 "Block Processing")
 
-  (express express? (lambda () (write-report-des-data-after-padding hex_strs_after_padding 64bits_blocks_after_padding express_path?)))
-
-  (let loop ([blocks 64bits_blocks_after_padding]
-             [block_index 1]
-             [last_result iv_bin]
-             [last_origin_bin (hex-string->binary-string "0000000000000000")]
-             [result_list '()])
-    (if (not (null? blocks))
-        (let* ([block_binary_data (car blocks)]
-               [operated_binary_data  #f]
-               [encrypted_block_binary_data #f]
-               [result_binary_data #f])
+        (let loop ([blocks 64bits_blocks_after_padding]
+                   [block_index 1]
+                   [last_result iv_bin]
+                   [last_origin_bin (hex-string->binary-string "0000000000000000")]
+                   [result_list '()])
+          (if (not (null? blocks))
+              (let* ([block_binary_data (car blocks)]
+                     [operated_binary_data  #f]
+                     [encrypted_block_binary_data #f]
+                     [result_binary_data #f])
 
           (express express? (lambda () (write-report-des-block-start block_index block_binary_data last_result express_path?)))
 

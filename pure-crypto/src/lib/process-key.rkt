@@ -3,22 +3,27 @@
 (require file/sha1)
 (require net/base64)
 
-(provide (contract-out
-          [process-key (->
-                         string?
-                         (and/c string? #px"^([0-9]|[a-f]){16}$")
-                         (or/c 'hex 'base64 'utf-8)
-                         (cons/c (listof (listof string?)) string?))]
-          ))
-
 (require "../../../../racket-detail/detail/main.rkt")
 
 (require "constants.rkt")
 (require "lib.rkt")
 (require "padding.rkt")
 
-(define (process-key key iv? key_format?)
-  (detail-page
+(provide (contract-out
+          [process-key (->*
+                         (string?)
+                         (
+                          #:iv? (and/c string? #px"^([0-9]|[a-f]){16}$")
+                          #:key_format? (or/c 'hex 'base64 'utf-8)
+                         )
+                         (cons/c (listof (listof string?)) string?))]
+          ))
+
+(define (process-key
+         key
+         #:iv? [iv? "0000000000000000"]
+         #:key_format? [key_format? 'utf-8])
+  (detail-div
    #:font_size 'small
    #:line_break_length 100
    (lambda ()

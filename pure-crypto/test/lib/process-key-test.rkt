@@ -17,7 +17,9 @@
            (detail 
             #:formats '(console "process-key.pdf")
             (lambda ()
-              (process-key "chensihe" "0000000000000000" 'utf-8)))])
+              (detail-page
+               (lambda ()
+                 (process-key "chensihe")))))])
       (check-equal? (car result)
          '(
            (
