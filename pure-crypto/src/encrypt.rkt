@@ -13,7 +13,7 @@
 (provide (contract-out
           [encrypt (->* (string? string?)
                     (
-                     #:type? (or/c 'des 'tdes 'aes)
+                     #:cipher? (or/c 'des 'tdes 'aes)
                      #:key_format? (or/c 'hex 'base64 'utf-8)
                      #:data_format? (or/c 'hex 'base64 'utf-8)
                      #:encrypted_format? (or/c 'hex 'base64)
@@ -27,7 +27,7 @@
 
 (define (encrypt 
          data key
-         #:type? [type? 'des]
+         #:cipher? [cipher? 'des]
          #:key_format? [key_format? 'utf-8]
          #:data_format? [data_format? 'utf-8]
          #:encrypted_format? [encrypted_format? 'hex]
@@ -107,13 +107,16 @@
                 (detail-line operated_binary_data)
 
                 (set! encrypted_block_binary_data
-                      (if (eq? type? 'des)
-                          (encryption block_index (list-ref k_lists 0) operated_binary_data express? express_path?)
-                          (let ([e1 #f]
-                                [ed2 #f])
-                            (set! e1 (encryption block_index (list-ref k_lists 0) operated_binary_data express? express_path?))
-                            (set! ed2 (decryption block_index reverse_ip_1_table reverse_ip_table (list-ref k_lists 1) e1 express? express_path?))
-                            (encryption block_index (list-ref k_lists 2) ed2 express? express_path?))))
+                      (cond
+                       [(eq? cipher? 'des)
+                        (des operated_binary_data (list-ref k_lists 0))])
+                      )
+;                       [(eq? cipher? 'tdes)
+;                        (let ([e1 #f]
+;                              [ed2 #f])
+;                          (set! e1 (des operated_binary_data (list-ref k_lists 0)))
+;                          (set! ed2 (undes reverse_ip_1_table reverse_ip_table (list-ref k_lists 1) e1 express? express_path?))
+;                          (des ed2 (list-ref k_lists 2)))]))
 
                 (detail-line "encrypted_block_binary_data:")
                 (detail-line encrypted_block_binary_data)
