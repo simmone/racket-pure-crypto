@@ -5,8 +5,8 @@
 
 (provide (contract-out
           [des (->
-                (listof (and/c string? #px"^([0-1]){48}$"))
                 (and/c string? #px"^([0-1]){64}$")
+                (listof (and/c string? #px"^([0-1]){48}$"))
                 (and/c string? #px"^([0-1]){64}$"))
                ]
           ))
@@ -22,7 +22,7 @@
          [r0 (substring ip0 32)]
          [encrypted_block_binary_data #f])
 
-    (detail-page
+    (detail-div
      #:font_size 'small
      (lambda ()
        
