@@ -65,9 +65,6 @@
           (define hex_strs_after_padding (car hex_and_bits))
           (set! 64bits_blocks_after_padding (cdr hex_and_bits))
 
-          (define reverse_ip_1_table (reverse-table *ip_1_table*))
-          (define reverse_ip_table (reverse-table *ip_table*))
-          
           (void)))
 
        (detail-page
