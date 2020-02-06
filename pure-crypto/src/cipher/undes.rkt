@@ -4,7 +4,7 @@
 (require net/base64)
 
 (provide (contract-out
-          [des (->
+          [undes (->
                 (and/c string? #px"^([0-1]){64}$")
                 (listof (and/c string? #px"^([0-1]){48}$"))
                 (and/c string? #px"^([0-1]){64}$"))
@@ -15,36 +15,83 @@
 (require "../lib/constants.rkt")
 (require "../lib/lib.rkt")
 
-(define (decryption binary_data k_list) 
-  (define ip1 (transform-binary-string binary_data reverse_ip1_table))
+(define (undes binary_data k_list)
+  (let ([ip1 #f]
+        [l16 #f]
+        [r16 #f])
+    (detail-div
+     #:font_size 'small
+     (lambda ()
+       
+       (detail-h3 "UNDES BLOCK DETAIL")
+       
+       (detail-list
+        (lambda ()
+          (detail-row (lambda () (detail-col  "binary_data:") (detail-col binary_data)))
+          (detail-row
+           (lambda () 
+             (detail-col "ip1:")
+             (set! ip1 (transform-binary-string binary_data *reverse_ip1_table*))
+             (detail-line ip1)))
+     
+          (detail-row
+           (lambda ()
+             (detail-col "l16:")
+             (set! l16 (substring ip1 32))
+             (detail-line l16)))
 
-  (define l16 (substring ip1 32))
+          (detail-row
+           (lambda ()
+             (detail-col "r16:")
+             (set! r16 (substring ip1 0 32))
+             (detail-col r16)))))
 
-  (define r16 (substring ip1 0 32))
+       (let loop ([rn_1 l16]
+                  [rn r16]
+                  [n 16])
+         (if (>= n 1)
+             (let* ([en #f]
+                    [kn #f]
+                    [kn_xor_en #f]
+                    [sbn #f]
+                    [fn #f]
+                    [ln_1 #f])
 
-  (express express? (lambda () (write-report-undes-uncipher-init block_index binary_data ip1 l16 r16 express_path?)))
-  
-  (let loop ([rn_1 l16]
-             [rn r16]
-             [n 16])
-    (if (>= n 1)
-        (let* ([en (transform-binary-string rn_1 *e_table*)]
-               [kn (list-ref k_list (sub1 n))]
-               [kn_xor_en
-                (~r #:base 2 #:min-width 48 #:pad-string "0"
-                    (bitwise-xor (string->number kn 2) (string->number en 2)))]
-               [sbn
-                (let loop-sb ([loop_list (split-string kn_xor_en 6)]
-                              [index 1]
-                              [result_str ""])
-                  (if (not (null? loop_list))
-                      (loop-sb (cdr loop_list) (add1 index) (string-append result_str (b6->b4 index (car loop_list))))
-                      result_str))]
-               [fn (transform-binary-string sbn *p_table*)]
-               [ln_1
-                (~r #:base 2 #:min-width 32 #:pad-string "0"
-                    (bitwise-xor (string->number rn 2) (string->number fn 2)))])
-          (express express? (lambda () (write-report-undes-step block_index n ln_1 rn_1 en kn kn_xor_en sbn fn rn express_path?)))
+               (detail-line "transform rn_1:")
+               (set! en (transform-binary-string rn_1 *e_table*))
+               (detail-line en #:line_break_length 64)
+
+               (detail-line (format "k~a:" n))
+               (set! kn (list-ref k_list (sub1 n)))
+               (detail-simple-list (split-string kn 6) #:cols_count 8)
+
+               (detail-line (format "k~a xor e~a:" n n))
+               (set! kn_xor_en
+                     (~r #:base 2 #:min-width 48 #:pad-string "0"
+                         (bitwise-xor (string->number kn 2) (string->number en 2))))
+               (detail-simple-list (split-string kn_xor_en 6) #:cols_count 8)
+
+               (detail-line (format "sb~a:" n))
+               (set! sbn
+                     (let loop-sb ([loop_list (split-string kn_xor_en 6)]
+                                   [index 1]
+                                   [result_str ""])
+                       (if (not (null? loop_list))
+                           (loop-sb (cdr loop_list) (add1 index) (string-append result_str (b6->b4 index (car loop_list))))
+                           result_str)))
+               (detail-simple-list (split-string sbn 4) #:cols_count 8)
+
+               (detail-line (format "f~a(sb~a transformed by p_table):" n n))
+               (set! fn (transform-binary-string sbn *p_table*))
+               (detail-simple-list (split-string fn 4) #:cols_count 8)
+
+               (detail-line "transform rn_1:")
+               (set! ln_1
+                     (~r #:base 2 #:min-width 32 #:pad-string "0"
+                         (bitwise-xor (string->number rn 2) (string->number fn 2))))
+
+               (express express? (lambda () (write-report-undes-step block_index n ln_1 rn_1 en kn kn_xor_en sbn fn rn express_path?)))
+
           (loop
            ln_1
            rn_1
