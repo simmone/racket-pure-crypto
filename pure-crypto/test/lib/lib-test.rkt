@@ -32,6 +32,10 @@
 
    (test-case
     "test-reverse-table"
+
+    (printf "~a\n" (reverse-table *ip_table*))
+
+    (printf "~a\n" (reverse-table *ip_1_table*))
     
     (check-equal?
      (reverse-table
