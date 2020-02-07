@@ -6,6 +6,7 @@
 (require "lib/process-key.rkt")
 (require "lib/process-data.rkt")
 (require "cipher/des.rkt")
+(require "cipher/undes.rkt")
 
 (require "../../../racket-detail/detail/main.rkt")
 
@@ -24,7 +25,7 @@
                      #:iv? string?
                      #:detail? (or/c #f (listof (or/c 'raw 'console path-string?)))
                     )
-                    string?)]
+                    (or/c #f string?))]
           ))
 
 (define (encrypt 
@@ -115,13 +116,13 @@
                   (set! encrypted_block_binary_data
                         (cond
                          [(eq? cipher? 'des)
-                          (des operated_binary_data (list-ref k_lists 0))]))
-                                        ;                       [(eq? cipher? 'tdes)
-                                        ;                        (let ([e1 #f]
-                                        ;                              [ed2 #f])
-                                        ;                          (set! e1 (des operated_binary_data (list-ref k_lists 0)))
-                                        ;                          (set! ed2 (undes reverse_ip_1_table reverse_ip_table (list-ref k_lists 1) e1 express? express_path?))
-                                        ;                          (des ed2 (list-ref k_lists 2)))]))
+                          (des operated_binary_data (list-ref k_lists 0))]
+                         [(eq? cipher? 'tdes)
+                          (let ([e1 #f]
+                                [ed2 #f])
+                            (set! e1 (des operated_binary_data (list-ref k_lists 0)))
+                            (set! ed2 (undes e1 (list-ref k_lists 1)))
+                            (des ed2 (list-ref k_lists 2)))]))
 
                   (detail-line "encrypted_block_binary_data:")
                   (detail-line encrypted_block_binary_data #:line_break_length 64 #:font_size 'small)
