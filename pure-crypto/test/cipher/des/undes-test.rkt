@@ -3,8 +3,8 @@
 (require rackunit)
 (require rackunit/text-ui)
 
-(require "../../src/cipher/undes.rkt")
-(require "../../../../racket-detail/detail/main.rkt")
+(require "../../../src/cipher/undes.rkt")
+(require "../../../../../racket-detail/detail/main.rkt")
 
 (define test-undes
   (test-suite

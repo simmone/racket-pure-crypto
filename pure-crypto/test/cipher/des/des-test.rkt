@@ -3,8 +3,8 @@
 (require rackunit)
 (require rackunit/text-ui)
 
-(require "../../src/cipher/des.rkt")
-(require "../../../../racket-detail/detail/main.rkt")
+(require "../../../src/cipher/des.rkt")
+(require "../../../../../racket-detail/detail/main.rkt")
 
 (define test-des
   (test-suite
