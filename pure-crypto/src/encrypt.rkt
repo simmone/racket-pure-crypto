@@ -7,6 +7,7 @@
 (require "lib/process-data.rkt")
 (require "cipher/des.rkt")
 (require "cipher/undes.rkt")
+(require "cipher/aes.rkt")
 
 (require "../../../racket-detail/detail/main.rkt")
 
