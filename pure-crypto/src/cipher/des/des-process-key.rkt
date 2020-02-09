@@ -3,14 +3,13 @@
 (require file/sha1)
 (require net/base64)
 
-(require "../../../../racket-detail/detail/main.rkt")
+(require "../../../../../racket-detail/detail/main.rkt")
 
-(require "constants.rkt")
-(require "lib.rkt")
-(require "padding.rkt")
+(require "../../lib/constants.rkt")
+(require "../../lib/lib.rkt")
 
 (provide (contract-out
-          [process-key (->*
+          [des-process-key (->*
                          (string?)
                          (
                           #:iv? (and/c string? #px"^([0-9]|[a-f]){16}$")
@@ -19,13 +18,13 @@
                          (cons/c (listof (listof string?)) string?))]
           ))
 
-(define (process-key
+(define (des-process-key
          key
          #:iv? [iv? "0000000000000000"]
          #:key_format? [key_format? 'utf-8])
   (detail-div
-   #:font_size 'small
-   #:line_break_length 100
+   #:font_size? 'small
+   #:line_break_length? 100
    (lambda ()
      (detail-h2 "Prepare Key")
 
@@ -65,7 +64,7 @@
           (substring hex_key 32 48))]))
 
      (detail-line "to keys:")
-     (detail-simple-list hex_keys #:cols_count 4)
+     (detail-simple-list hex_keys #:cols_count? 4)
 
      (detail-line (format "iv:[~a]" iv?))
      (define iv_bin (~r #:min-width 64 #:base 2 #:pad-string "0" (string->number iv? 16)))
@@ -87,7 +86,7 @@
                (detail-line (format "key:[~a]" (car loop_keys)))
                (set! key_b8_list (hex-string->binary-string-list (car loop_keys) 8))
                (detail-line "key_b8_list:")
-               (detail-simple-list key_b8_list #:cols_count 4)
+               (detail-simple-list key_b8_list #:cols_count? 4)
 
                (detail-line "key_56b_list:")
                (set! key_56b
@@ -96,7 +95,7 @@
                       *pc1_table*))
                
                (set! key_56b_list (split-string key_56b 7))
-               (detail-simple-list key_56b_list #:cols_count 4)
+               (detail-simple-list key_56b_list #:cols_count? 4)
 
                (set! c0 (substring key_56b 0 28))
                (set! d0 (substring key_56b 28))
@@ -113,7 +112,7 @@
                               next_c
                               (cons next_c result_list)))
                            (reverse result_list))))
-               (detail-simple-list c_list #:cols_count 1)
+               (detail-simple-list c_list #:cols_count? 1)
 
                (detail-line "d_list:")
                (set! d_list
@@ -127,7 +126,7 @@
                               next_d
                               (cons next_d result_list)))
                            (reverse result_list))))
-               (detail-simple-list d_list #:cols_count 1)
+               (detail-simple-list d_list #:cols_count? 1)
                
                (detail-line "loop_k_list:")
                (set! loop_k_list
@@ -149,7 +148,7 @@
                  (lambda (k)
                    (foldr (lambda (a b) (string-append a " " b)) "" (split-string k 6)))
                  loop_k_list)
-                #:cols_count 1)
+                #:cols_count? 1)
                
                (loop-keys (cdr loop_keys) (cons loop_k_list loop_k_lists)))
              (reverse loop_k_lists))))

@@ -3,23 +3,24 @@
 (require rackunit)
 (require rackunit/text-ui)
 
-(require "../../src/lib/process-key.rkt")
-(require "../../../../racket-detail/detail/main.rkt")
+(require "../../../src/cipher/des/des-process-key.rkt")
 
-(define test-process-key
+(require "../../../../../racket-detail/detail/main.rkt")
+
+(define test-des-process-key
   (test-suite
-   "test-process-key"
+   "test-des-process-key"
 
    (test-case
-    "test-process-key"
+    "test-des-process-key"
 
     (let ([result
            (detail 
-            #:formats '(console "process-key.pdf")
+            #:formats? '(console "des-process-key.pdf")
             (lambda ()
               (detail-page
                (lambda ()
-                 (process-key "chensihe")))))])
+                 (des-process-key "chensihe")))))])
       (check-equal? (car result)
          '(
            (
@@ -47,4 +48,4 @@
     )
    )
 
- (run-tests test-process-key)
+ (run-tests test-des-process-key)

@@ -53,6 +53,8 @@
         (lambda ()
           (detail-h1 "Encryption Detail")
 
+          (define hex_key (to-hex-key key #:cipher? cipher? #:key_format key_format?))
+
           (define key_and_iv (process-key key #:iv? iv? #:key_format? key_format?))
 
           (set! k_lists (car key_and_iv))
