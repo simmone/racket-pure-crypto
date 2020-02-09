@@ -41,8 +41,8 @@
          #:detail? [detail? #f]
          )
   (detail 
-   #:formats detail?
-   #:exception_value #f
+   #:formats? detail?
+   #:exception_value? #f
    (lambda ()
 
      (let ([k_lists #f]
@@ -70,7 +70,7 @@
           (void)))
 
        (detail-page
-        #:line_break_length 32
+        #:line_break_length? 32
         (lambda ()
           (detail-h2 "Block Processing")
 
@@ -87,7 +87,7 @@
 
                   (detail-line (format "----block index:[~a]----" block_index))
                   (detail-line "block_binary_data:")
-                  (detail-line block_binary_data #:line_break_length 8)
+                  (detail-line block_binary_data #:line_break_length? 8)
 
                   (cond
                    [(eq? operation_mode? 'ecb)
@@ -126,7 +126,7 @@
                             (des ed2 (list-ref k_lists 2)))]))
 
                   (detail-line "encrypted_block_binary_data:")
-                  (detail-line encrypted_block_binary_data #:line_break_length 64 #:font_size 'small)
+                  (detail-line encrypted_block_binary_data #:line_break_length? 64 #:font_size? 'small)
 
                   (set! result_binary_data
                         (cond
@@ -177,13 +177,13 @@
                          [else
                           encrypted_data])])
                   (detail-line "encrypted_binary_data_list:")
-                  (detail-simple-list encrypted_binary_data_list #:cols_count 1 #:font_size 'small)
+                  (detail-simple-list encrypted_binary_data_list #:cols_count? 1 #:font_size? 'small)
 
                   (detail-line "encryted_hex_data:")
-                  (detail-line encrypted_data #:line_break_length 16)
+                  (detail-line encrypted_data #:line_break_length? 16)
 
                   (detail-line (format "encryted_format?:[~a]" encrypted_format?))
 
-                  (detail-line final_data #:line_break_length 16)
+                  (detail-line final_data #:line_break_length? 16)
 
                   final_data)))))))))

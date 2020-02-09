@@ -23,7 +23,7 @@
 
 (define (aes block key)
   (detail-div
-   #:font_size 'small
+   #:font_size? 'small
    (lambda ()
      (let ([nb 4]
            [nk #f]
@@ -109,13 +109,13 @@
 
          (detail-h2 "Cipher End")
             
-         (detail-line state #:font_size 'big #:line_break_length 32)
+         (detail-line state #:font_size? 'big #:line_break_length? 32)
          
          state)))))
 
 (define (unaes block key)
   (detail-div 
-   #:font_size 'small
+   #:font_size? 'small
    (lambda ()
 
      (let ([nb 4]
@@ -202,7 +202,7 @@
 
          (detail-h2 "InvCipher End")
             
-         (detail-line state #:font_size 'big #:line_break_length 32)
+         (detail-line state #:font_size? 'big #:line_break_length? 32)
          
          state)))))
 

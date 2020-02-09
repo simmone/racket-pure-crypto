@@ -15,7 +15,7 @@
 
     (check-equal? 
      (detail 
-      #:formats #f
+      #:formats? #f
       (lambda ()
         (detail-page
          (lambda ()

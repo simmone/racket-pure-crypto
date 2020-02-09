@@ -16,9 +16,9 @@
                ]
           ))
 
-(require "../../../../racket-detail/detail/main.rkt")
-(require "../lib/constants.rkt")
-(require "../lib/lib.rkt")
+(require "../../../../../racket-detail/detail/main.rkt")
+(require "../../lib/constants.rkt")
+(require "../../lib/lib.rkt")
 
 (define (des operated_binary_data key_list)
   (let* ([m0 operated_binary_data]
@@ -28,7 +28,7 @@
          [encrypted_block_binary_data #f])
 
     (detail-div
-     #:font_size 'small
+     #:font_size? 'small
      (lambda ()
        
        (detail-h3 "DES BLOCK DETAIL")
@@ -46,10 +46,10 @@
          (detail-line (format "--------n: ~a--------" n))
 
          (detail-line (format "l~a:" (sub1 n)))
-         (detail-simple-list (split-string ln_1 4) #:cols_count 8)
+         (detail-simple-list (split-string ln_1 4) #:cols_count? 8)
 
          (detail-line (format "r~a:" (sub1 n)))
-         (detail-simple-list (split-string rn_1 4) #:cols_count 8)
+         (detail-simple-list (split-string rn_1 4) #:cols_count? 8)
 
          (if (<= n 16)
              (let ([en #f]
@@ -61,17 +61,17 @@
 
              (detail-line (format "e~a(r~a transformed by e_table):" n (sub1 n)))
              (set! en (transform-binary-string rn_1 *e_table*))
-             (detail-simple-list (split-string en 6) #:cols_count 8)
+             (detail-simple-list (split-string en 6) #:cols_count? 8)
 
              (detail-line (format "k~a:" n))
              (set! kn (list-ref key_list (sub1 n)))
-             (detail-simple-list (split-string kn 6) #:cols_count 8)
+             (detail-simple-list (split-string kn 6) #:cols_count? 8)
 
              (detail-line (format "k~a xor e~a:" n n))
              (set! kn_xor_en
                    (~r #:base 2 #:min-width 48 #:pad-string "0"
                        (bitwise-xor (string->number kn 2) (string->number en 2))))
-             (detail-simple-list (split-string kn_xor_en 6) #:cols_count 8)
+             (detail-simple-list (split-string kn_xor_en 6) #:cols_count? 8)
 
              (detail-line (format "sb~a:" n))
              (set! sbn
@@ -81,17 +81,17 @@
                      (if (not (null? loop_list))
                          (loop-sb (cdr loop_list) (add1 index) (string-append result_str (b6->b4 index (car loop_list))))
                          result_str)))
-             (detail-simple-list (split-string sbn 4) #:cols_count 8)
+             (detail-simple-list (split-string sbn 4) #:cols_count? 8)
 
              (detail-line (format "f~a(sb~a transformed by b_table):" n n))
              (set! fn (transform-binary-string sbn *p_table*))
-             (detail-simple-list (split-string fn 4) #:cols_count 8)
+             (detail-simple-list (split-string fn 4) #:cols_count? 8)
 
              (detail-line (format "r~a(l~a xor f~a):" n (sub1 n) n))
              (set! rn
                    (~r #:base 2 #:min-width 32 #:pad-string "0"
                        (bitwise-xor (string->number ln_1 2) (string->number fn 2))))
-             (detail-simple-list (split-string rn 4) #:cols_count 8)
+             (detail-simple-list (split-string rn 4) #:cols_count? 8)
 
              (detail-line (format "--------n: ~a--------" n))
 
@@ -99,9 +99,9 @@
             (let* ([r16l16 (string-append rn_1 ln_1)]
                    [ip1 (transform-binary-string r16l16 *ip_1_table*)])
               (detail-line "r16l16:")
-              (detail-simple-list (split-string r16l16 8) #:cols_count 8)
+              (detail-simple-list (split-string r16l16 8) #:cols_count? 8)
               (detail-line "ip1")
-              (detail-simple-list (split-string ip1 8) #:cols_count 8)
+              (detail-simple-list (split-string ip1 8) #:cols_count? 8)
               (detail-line (format "final hex: {~a}" (string-upcase (~r #:min-width 16 #:base 16 #:pad-string "0" (string->number ip1 2)))))
               ip1)))))))
 
@@ -110,8 +110,8 @@
         [l16 #f]
         [r16 #f])
     (detail-div
-     #:line_break_length 64
-     #:font_size 'small
+     #:line_break_length? 64
+     #:font_size? 'small
      (lambda ()
        
        (detail-h3 "UNDES BLOCK DETAIL")
@@ -146,17 +146,17 @@
 
                (detail-line "transform rn_1:")
                (set! en (transform-binary-string rn_1 *e_table*))
-               (detail-line en #:line_break_length 64)
+               (detail-line en #:line_break_length? 64)
 
                (detail-line (format "k~a:" n))
                (set! kn (list-ref k_list (sub1 n)))
-               (detail-simple-list (split-string kn 6) #:cols_count 8)
+               (detail-simple-list (split-string kn 6) #:cols_count? 8)
 
                (detail-line (format "k~a xor e~a:" n n))
                (set! kn_xor_en
                      (~r #:base 2 #:min-width 48 #:pad-string "0"
                          (bitwise-xor (string->number kn 2) (string->number en 2))))
-               (detail-simple-list (split-string kn_xor_en 6) #:cols_count 8)
+               (detail-simple-list (split-string kn_xor_en 6) #:cols_count? 8)
 
                (detail-line (format "sb~a:" n))
                (set! sbn
@@ -166,11 +166,11 @@
                        (if (not (null? loop_list))
                            (loop-sb (cdr loop_list) (add1 index) (string-append result_str (b6->b4 index (car loop_list))))
                            result_str)))
-               (detail-simple-list (split-string sbn 4) #:cols_count 8)
+               (detail-simple-list (split-string sbn 4) #:cols_count? 8)
 
                (detail-line (format "f~a(sb~a transformed by p_table):" n n))
                (set! fn (transform-binary-string sbn *p_table*))
-               (detail-simple-list (split-string fn 4) #:cols_count 8)
+               (detail-simple-list (split-string fn 4) #:cols_count? 8)
 
                (detail-line "transform ln_1:")
                (set! ln_1

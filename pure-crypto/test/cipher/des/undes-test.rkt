@@ -3,7 +3,7 @@
 (require rackunit)
 (require rackunit/text-ui)
 
-(require "../../../src/cipher/undes.rkt")
+(require "../../../src/cipher/des/des.rkt")
 (require "../../../../../racket-detail/detail/main.rkt")
 
 (define test-undes
@@ -15,7 +15,7 @@
 
     (check-equal?
      (detail 
-      #:formats '(console "undes.pdf")
+      #:formats? '(console "undes.pdf")
       (lambda ()
         (detail-page
          (lambda ()

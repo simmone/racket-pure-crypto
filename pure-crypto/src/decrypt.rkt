@@ -40,8 +40,8 @@
                )
 
   (detail 
-   #:formats detail?
-   #:exception_value #f
+   #:formats? detail?
+   #:exception_value? #f
    (lambda ()
 
      (let ([k_lists #f]
@@ -85,7 +85,7 @@
                 (detail-line (format "----block index:[~a]----" block_index))
 
                 (detail-line "encrypted_block_data:")
-                (detail-line encrypted_block_data #:line_break_length 8)
+                (detail-line encrypted_block_data #:line_break_length? 8)
 
                 (detail-line "last_factor:")
                 (detail-line (format "~a" last_factor))
@@ -165,7 +165,7 @@
                       (reverse result_list))])
 
                 (detail-line "decrypted_data_hex_strs:")
-                (detail-simple-list decrypted_data_hex_strs #:cols_count 1 #:font_size 'small)
+                (detail-simple-list decrypted_data_hex_strs #:cols_count? 1 #:font_size? 'small)
 
                 (detail-line "hex_strs_after_remove_padding:")
                 (define hex_strs_after_remove_padding
@@ -187,14 +187,14 @@
                                   (unpadding-iso10126 (last decrypted_data_hex_strs) 64)]
                                  ))
                       decrypted_data_hex_strs))
-                (detail-simple-list hex_strs_after_remove_padding #:cols_count 1 #:font_size 'small)
+                (detail-simple-list hex_strs_after_remove_padding #:cols_count? 1 #:font_size? 'small)
 
                 (let* ([decrypted_hex_data #f]
                        [final_data #f])
                   
                   (detail-line "decrypted_hex_data:")
                   (set! decrypted_hex_data (foldr string-append "" hex_strs_after_remove_padding))
-                  (detail-line decrypted_hex_data #:line_break_length 16)
+                  (detail-line decrypted_hex_data #:line_break_length? 16)
                   
                   (detail-line "final data:")
                   (set! final_data
@@ -205,6 +205,6 @@
                           (bytes->string/utf-8 (base64-encode (hex-string->bytes decrypted_hex_data)))]
                          [else
                           decrypted_hex_data]))
-                  (detail-line final_data #:line_break_length 16)
+                  (detail-line final_data #:line_break_length? 16)
 
                   final_data))))))))))
