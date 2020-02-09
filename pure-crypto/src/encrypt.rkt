@@ -123,7 +123,10 @@
                                 [ed2 #f])
                             (set! e1 (des operated_binary_data (list-ref k_lists 0)))
                             (set! ed2 (undes e1 (list-ref k_lists 1)))
-                            (des ed2 (list-ref k_lists 2)))]))
+                            (des ed2 (list-ref k_lists 2)))]
+                         [(eq? cipher? 'aes)
+                          (aes operated_binary_data (list-ref k_lists 0))]
+                         ))
 
                   (detail-line "encrypted_block_binary_data:")
                   (detail-line encrypted_block_binary_data #:line_break_length? 64 #:font_size? 'small)
