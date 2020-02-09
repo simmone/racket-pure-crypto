@@ -3,11 +3,11 @@
 (require "lib/constants.rkt")
 (require "lib/lib.rkt")
 (require "lib/padding.rkt")
-(require "lib/process-key.rkt")
+(require "lib/to-hex-key.rkt")
 (require "lib/process-data.rkt")
-(require "cipher/des.rkt")
-(require "cipher/undes.rkt")
-(require "cipher/aes.rkt")
+(require "cipher/des/des.rkt")
+(require "cipher/des/des-key-lists.rkt")
+(require "cipher/aes/aes.rkt")
 
 (require "../../../racket-detail/detail/main.rkt")
 
@@ -45,20 +45,24 @@
    #:exception_value? #f
    (lambda ()
 
-     (let ([k_lists #f]
+     (let ([des_k_lists #f]
+           [hex_key #f]
            [iv_bin #f]
            [64bits_blocks_after_padding #f])
 
        (detail-page
         (lambda ()
-          (detail-h1 "Encryption Detail")
+          (detail-h1 (format "~a Encryption Detail" (string-upcase (symbol->string cipher?))))
 
-          (define hex_key (to-hex-key key #:cipher? cipher? #:key_format key_format?))
+          (set! hex_key (to-hex-key key #:cipher? cipher? #:key_format? key_format?))
 
-          (define key_and_iv (process-key key #:iv? iv? #:key_format? key_format?))
+          (cond
+           [(or (eq? cipher? 'des) (eq? cipher? 'tdes))
+            (set! des_k_lists (des-key-lists key #:key_format? key_format?))])
 
-          (set! k_lists (car key_and_iv))
-          (set! iv_bin (cdr key_and_iv))
+          (detail-line (format "iv:[~a]" iv?))
+          (set! iv_bin (~r #:min-width 64 #:base 2 #:pad-string "0" (string->number iv? 16)))
+          (detail-line (format "iv in binary:[~a]" iv_bin))
 
           (define hex_and_bits 
             (process-data
@@ -67,9 +71,7 @@
              #:padding_mode? padding_mode?
              #:operation_mode? operation_mode?))
           (define hex_strs_after_padding (car hex_and_bits))
-          (set! 64bits_blocks_after_padding (cdr hex_and_bits))
-
-          (void)))
+          (set! 64bits_blocks_after_padding (cdr hex_and_bits))))
 
        (detail-page
         #:line_break_length? 32
@@ -119,15 +121,15 @@
                   (set! encrypted_block_binary_data
                         (cond
                          [(eq? cipher? 'des)
-                          (des operated_binary_data (list-ref k_lists 0))]
+                          (des operated_binary_data (list-ref des_k_lists 0))]
                          [(eq? cipher? 'tdes)
                           (let ([e1 #f]
                                 [ed2 #f])
-                            (set! e1 (des operated_binary_data (list-ref k_lists 0)))
-                            (set! ed2 (undes e1 (list-ref k_lists 1)))
-                            (des ed2 (list-ref k_lists 2)))]
+                            (set! e1 (des operated_binary_data (list-ref des_k_lists 0)))
+                            (set! ed2 (undes e1 (list-ref des_k_lists 1)))
+                            (des ed2 (list-ref des_k_lists 2)))]
                          [(eq? cipher? 'aes)
-                          (aes operated_binary_data (list-ref k_lists 0))]
+                          (aes operated_binary_data hex_key)]
                          ))
 
                   (detail-line "encrypted_block_binary_data:")

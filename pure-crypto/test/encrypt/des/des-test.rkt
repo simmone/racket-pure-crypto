@@ -12,18 +12,16 @@
    (test-case
     "test-ecb"
 
-    (check-exn
-     exn:fail?
-     (lambda ()
-       (encrypt "chenxiao" "陈晓陈晓陈晓" #:operation_mode? 'ecb)))
+    (check-equal?
+     (encrypt "chenxiao" "陈晓陈晓陈晓" #:operation_mode? 'ecb)
+     #f)
 
-    (check-exn
-     exn:fail?
-     (lambda ()
-       (encrypt "0123456789ABCDEF" "133457799BBCDFF" #:operation_mode? 'ecb #:data_format? 'hex #:key_format? 'hex)))
+    (check-equal?
+     (encrypt "0123456789ABCDEF" "133457799BBCDFF" #:operation_mode? 'ecb #:data_format? 'hex #:key_format? 'hex)
+     #f)
 
     (check-equal? 
-     (encrypt "chenxiao" "chensihe" #:operation_mode? 'ecb)
+     (encrypt "chenxiao" "chensihe" #:operation_mode? 'ecb #:detail? '(console "ecb.pdf"))
      "E99DAFFBF097826E")
 
     (check-equal? 

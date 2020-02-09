@@ -15,7 +15,7 @@
 
     (let ([result
            (detail 
-            #:formats '(console "process-data.pdf")
+            #:formats? #f
             (lambda ()
               (detail-page
                (lambda ()

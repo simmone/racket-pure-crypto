@@ -9,24 +9,22 @@
 (require "../../lib/lib.rkt")
 
 (provide (contract-out
-          [des-process-key (->*
+          [des-key-lists (->*
                          (string?)
                          (
-                          #:iv? (and/c string? #px"^([0-9]|[a-f]){16}$")
                           #:key_format? (or/c 'hex 'base64 'utf-8)
                          )
-                         (cons/c (listof (listof string?)) string?))]
+                         (listof (listof string?)))]
           ))
 
-(define (des-process-key
+(define (des-key-lists
          key
-         #:iv? [iv? "0000000000000000"]
          #:key_format? [key_format? 'utf-8])
   (detail-div
    #:font_size? 'small
    #:line_break_length? 100
    (lambda ()
-     (detail-h2 "Prepare Key")
+     (detail-h2 "Generate Key")
 
      (detail-line (format "key:[~a][~a]" key key_format?))
      
@@ -66,11 +64,7 @@
      (detail-line "to keys:")
      (detail-simple-list hex_keys #:cols_count? 4)
 
-     (detail-line (format "iv:[~a]" iv?))
-     (define iv_bin (~r #:min-width 64 #:base 2 #:pad-string "0" (string->number iv? 16)))
-     (detail-line (format "iv in binary:[~a]" iv_bin))
-
-     (define k_list
+     (define k_lists
        (let loop-keys ([loop_keys hex_keys]
                        [loop_k_lists '()])
          (if (not (null? loop_keys))
@@ -153,4 +147,11 @@
                (loop-keys (cdr loop_keys) (cons loop_k_list loop_k_lists)))
              (reverse loop_k_lists))))
 
-     (cons k_list iv_bin))))
+     (detail-line "k_lists:")
+     (let loop ([n 0])
+       (when (< n (length k_lists))
+        (detail-line (format "key[~a]:" n))
+        (detail-simple-list (list-ref k_lists n) #:cols_count? 1)
+        (loop (add1 n))))
+
+     k_lists)))

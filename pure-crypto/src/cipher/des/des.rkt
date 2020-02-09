@@ -31,7 +31,7 @@
      #:font_size? 'small
      (lambda ()
        
-       (detail-h3 "DES BLOCK DETAIL")
+       (detail-h3 "BLOCK DETAIL")
 
        (detail-list
         (lambda ()

@@ -3,25 +3,25 @@
 (require rackunit)
 (require rackunit/text-ui)
 
-(require "../../../src/cipher/des/des-process-key.rkt")
+(require "../../../src/cipher/des/des-key-lists.rkt")
 
 (require "../../../../../racket-detail/detail/main.rkt")
 
-(define test-des-process-key
+(define test-des-key-lists
   (test-suite
-   "test-des-process-key"
+   "test-des-key-lists"
 
    (test-case
-    "test-des-process-key"
+    "test-des-key-lists"
 
     (let ([result
            (detail 
-            #:formats? '(console "des-process-key.pdf")
+            #:formats? '(console "des-key-lists.pdf")
             (lambda ()
               (detail-page
                (lambda ()
-                 (des-process-key "chensihe")))))])
-      (check-equal? (car result)
+                 (des-key-lists "chensihe")))))])
+      (check-equal? result
          '(
            (
            "111000001011111001101110101000010101000000101101"
@@ -40,12 +40,7 @@
            "110100101010111010101110010000010100111000001100"
            "111110001011111000100110010110000011000010011000"
            "111100011011111000100110100110001010010000110101")
-           ))
+           ))))
+   ))
 
-      (check-equal? (cdr result)
-                    "0000000000000000000000000000000000000000000000000000000000000000")))
-
-    )
-   )
-
- (run-tests test-des-process-key)
+ (run-tests test-des-key-lists)

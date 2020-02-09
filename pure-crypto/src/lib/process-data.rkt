@@ -29,8 +29,8 @@
          #:operation_mode? [operation_mode? 'cbc])
 
   (detail-div
-   #:font_size 'small
-   #:line_break_length 100
+   #:font_size? 'small
+   #:line_break_length? 100
    (lambda ()
      (detail-h2 "Prepare Data")
 
@@ -56,7 +56,7 @@
      (detail-line "data in byte list:")
      (detail-simple-list
       (map (lambda (b) (~r #:base 2 #:pad-string "0" #:min-width 8 b)) data_byte_list)
-      #:cols_count 8)
+      #:cols_count? 8)
 
      (when
          (and
@@ -69,7 +69,7 @@
 
      (detail-line "data in hex:")
      (define data_to_hex_strs (split-string (bytes->hex-string (list->bytes data_byte_list)) 16))
-     (detail-simple-list data_to_hex_strs #:cols_count 4)
+     (detail-simple-list data_to_hex_strs #:cols_count? 4)
 
      (detail-line (format "padding_mode:[~a]" padding_mode?))
      (detail-line "hex blocks after padding:")
@@ -92,7 +92,7 @@
                        (padding-iso10126 (last data_to_hex_strs) 64)]
                       ))
            data_to_hex_strs))
-     (detail-simple-list hex_strs_after_padding #:cols_count 4)
+     (detail-simple-list hex_strs_after_padding #:cols_count? 4)
 
      (detail-line "64bits blocks after padding:")
      (define 64bits_blocks_after_padding
@@ -100,6 +100,6 @@
         (lambda (hex_block)
           (~r #:base 2 #:min-width (* (string-length hex_block) 4) #:pad-string "0" (string->number hex_block 16)))
         hex_strs_after_padding))
-     (detail-simple-list 64bits_blocks_after_padding #:cols_count 4)
+     (detail-simple-list 64bits_blocks_after_padding #:cols_count? 4)
 
   (cons hex_strs_after_padding 64bits_blocks_after_padding))))
