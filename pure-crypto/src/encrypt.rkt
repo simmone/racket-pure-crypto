@@ -54,15 +54,18 @@
         (lambda ()
           (detail-h1 (format "~a Encryption Detail" (string-upcase (symbol->string cipher?))))
 
+          (when (not (regexp-match #px"^([0-9a-zA-Z]){16}$" iv?))
+            (error "iv should be in 16 hex format."))
+
+          (detail-line (format "iv:[~a]" iv?))
+          (set! iv_bin (~r #:min-width 64 #:base 2 #:pad-string "0" (string->number iv? 16)))
+          (detail-line (format "iv in binary:[~a]" iv_bin))
+
           (set! hex_key (to-hex-key key #:cipher? cipher? #:key_format? key_format?))
 
           (cond
            [(or (eq? cipher? 'des) (eq? cipher? 'tdes))
             (set! des_k_lists (des-key-lists key #:key_format? key_format?))])
-
-          (detail-line (format "iv:[~a]" iv?))
-          (set! iv_bin (~r #:min-width 64 #:base 2 #:pad-string "0" (string->number iv? 16)))
-          (detail-line (format "iv in binary:[~a]" iv_bin))
 
           (define hex_and_bits 
             (process-data
