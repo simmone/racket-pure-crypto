@@ -15,13 +15,24 @@
 
     (let ([result
            (detail 
-            #:formats? #f
+            #:formats? '("process-data-64.pdf")
             (lambda ()
               (detail-page
                (lambda ()
-                 (process-data "a")))))])
+                 (process-data "a" 64 16 8)))))])
       (check-equal? (car result) '("6107070707070707"))
       (check-equal? (cdr result) '("0110000100000111000001110000011100000111000001110000011100000111")))
+
+    (let ([result
+           (detail 
+            #:formats? '("process-data-128.pdf")
+            (lambda ()
+              (detail-page
+               (lambda ()
+                 (process-data "a" 128 32 16)))))])
+      (check-equal? (car result) '("610f0f0f0f0f0f0f0f0f0f0f0f0f0f0f"))
+      (check-equal? (cdr result) '("01100001000011110000111100001111000011110000111100001111000011110000111100001111000011110000111100001111000011110000111100001111")))
+
     )
    ))
 

@@ -10,60 +10,71 @@
    "test-padding"
 
    (test-case
-    "test-pkcs5"
+    "test-pkcs7"
 
     (check-equal? 
-     (padding-pkcs5 "0102030405060708" 64)
+     (padding-pkcs7 "0102030405060708" 64)
      "0102030405060708")
 
     (check-equal? 
-     (padding-pkcs5 "0102030405060708" 128)
+     (padding-pkcs7 "0102030405060708" 128)
      "01020304050607080808080808080808")
 
     (check-equal? 
-     (padding-pkcs5 "01020304050607" 64)
-     "0102030405060701")
+     (padding-pkcs7 "01" 64)
+     "0107070707070707")
 
     (check-equal? 
-     (padding-pkcs5 "010203040506" 64)
+     (padding-pkcs7 "01" 128)
+     "010f0f0f0f0f0f0f0f0f0f0f0f0f0f0f")
+
+    (check-equal? 
+     (padding-pkcs7 "010203040506" 64)
      "0102030405060202")
 
     (check-equal? 
-     (padding-pkcs5 "010203" 64)
+     (padding-pkcs7 "010203" 64)
      "0102030505050505")
 
     (check-equal? 
-     (padding-pkcs5 "61" 64)
+     (padding-pkcs7 "61" 64)
      "6107070707070707")
 
     (check-equal? 
-     (unpadding-pkcs5 "6107070707070707" 64)
+     (unpadding-pkcs7 "6107070707070707" 64)
       "61")
 
     (check-equal? 
-     (unpadding-pkcs5 "0102030405060708" 64)
+     (unpadding-pkcs7 "01020304050607080808080808080808" 128)
      "0102030405060708")
 
     (check-equal? 
-     (unpadding-pkcs5 "0102030405060701" 64)
+     (unpadding-pkcs7 "010f0f0f0f0f0f0f0f0f0f0f0f0f0f0f" 128)
+     "01")
+
+    (check-equal? 
+     (unpadding-pkcs7 "0102030405060708" 64)
+     "0102030405060708")
+
+    (check-equal? 
+     (unpadding-pkcs7 "0102030405060701" 64)
      "01020304050607")
 
     (check-equal? 
-     (unpadding-pkcs5 "0102030405060202" 64)
+     (unpadding-pkcs7 "0102030405060202" 64)
      "010203040506")
 
     (check-equal? 
-     (unpadding-pkcs5 "0102030505050505" 64)
+     (unpadding-pkcs7 "0102030505050505" 64)
      "010203")
 
     (check-equal? 
-     (unpadding-pkcs5 "010203050505050505" 64)
+     (unpadding-pkcs7 "010203050505050505" 64)
      "01020305")
 
     (check-equal? 
-     (unpadding-pkcs5 "01020305050505" 64)
+     (unpadding-pkcs7 "01020305050505" 64)
      "01020305050505")
-
     )
 
    (test-case
@@ -83,6 +94,14 @@
 
     (check-equal? 
      (unpadding-zero "0102030405060708" 64)
+     "0102030405060708")
+
+    (check-equal? 
+     (padding-zero "0102030405060708" 128)
+     "01020304050607080000000000000000")
+
+    (check-equal? 
+     (unpadding-zero "01020304050607080000000000000000" 128)
      "0102030405060708")
 
     (check-equal? 
@@ -116,6 +135,14 @@
     (check-equal? 
      (unpadding-ansix923 "0102030405060708" 64)
      "0102030405060708")
+
+    (check-equal? 
+     (padding-ansix923 "" 128)
+     "00000000000000000000000000000010")
+
+    (check-equal? 
+     (unpadding-ansix923 "00000000000000000000000000000010" 128)
+     "")
 
     (check-equal? 
      (unpadding-ansix923 "0102030405060701" 64)

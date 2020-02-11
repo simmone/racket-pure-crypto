@@ -21,7 +21,7 @@
                      #:key_format? (or/c 'hex 'base64 'utf-8)
                      #:data_format? (or/c 'hex 'base64 'utf-8)
                      #:encrypted_format? (or/c 'hex 'base64)
-                     #:padding_mode? (or/c 'pkcs5 'zero 'no-padding 'ansix923 'iso10126)
+                     #:padding_mode? (or/c 'pkcs7 'zero 'no-padding 'ansix923 'iso10126)
                      #:operation_mode? (or/c 'ecb 'cbc 'pcbc 'cfb 'ofb)
                      #:iv? string?
                      #:detail? (or/c #f (listof (or/c 'raw 'console path-string?)))
@@ -35,7 +35,7 @@
          #:key_format? [key_format? 'utf-8]
          #:data_format? [data_format? 'utf-8]
          #:encrypted_format? [encrypted_format? 'hex]
-         #:padding_mode? [padding_mode? 'pkcs5]
+         #:padding_mode? [padding_mode? 'pkcs7]
          #:operation_mode? [operation_mode? 'cbc]
          #:iv? [iv? "0000000000000000"]
          #:detail? [detail? #f]
@@ -48,28 +48,44 @@
      (let ([des_k_lists #f]
            [hex_key #f]
            [iv_bin #f]
-           [64bits_blocks_after_padding #f])
+           [block_bit_size #f]
+           [block_hex_size #f]
+           [block_byte_size #f]
+           [bits_blocks_after_padding #f])
 
        (detail-page
         (lambda ()
           (detail-h1 (format "~a Encryption Detail" (string-upcase (symbol->string cipher?))))
 
-          (when (not (regexp-match #px"^([0-9a-zA-Z]){16}$" iv?))
-            (error "iv should be in 16 hex format."))
+          (set! block_bit_size 
+                (cond
+                 [(or (eq? cipher? 'des) (eq? cipher? 'tdes))
+                  64]
+                 [(eq? cipher? 'aes)
+                  128]))
+          (detail-line (format "block_bit_size:[~a]" block_bit_size))
+          (set! block_hex_size (/ block_bit_size 4))
+          (set! block_byte_size (/ block_bit_size 8))
+
+          (when (not (regexp-match (pregexp (format "^([0-9a-zA-Z]){~a}$" block_hex_size)) iv?))
+            (error (format "iv should be in ~a hex format." block_hex_size)))
 
           (detail-line (format "iv:[~a]" iv?))
-          (set! iv_bin (~r #:min-width 64 #:base 2 #:pad-string "0" (string->number iv? 16)))
-          (detail-line (format "iv in binary:[~a]" iv_bin))
+          (set! iv_bin (~r #:min-width block_size #:base 2 #:pad-string "0" (string->number iv? 16)))
+          (detail-line "iv in binary:")
+          (detail-line iv_bin #:line_break_length 32)
 
           (set! hex_key (to-hex-key key #:cipher? cipher? #:key_format? key_format?))
 
-          (cond
-           [(or (eq? cipher? 'des) (eq? cipher? 'tdes))
-            (set! des_k_lists (des-key-lists key #:key_format? key_format?))])
+          (when (or (eq? cipher? 'des) (eq? cipher? 'tdes))
+            (set! des_k_lists (des-key-lists key #:key_format? key_format?)))
 
           (define hex_and_bits 
             (process-data
              data
+             block_bit_size
+             block_hex_size
+             block_byte_size
              #:data_format? data_format?
              #:padding_mode? padding_mode?
              #:operation_mode? operation_mode?))

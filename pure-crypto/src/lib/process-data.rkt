@@ -13,10 +13,13 @@
           [process-data (->*
                          (
                           (or/c (listof byte?) string?)
+                          natural?
+                          natural?
+                          natural?
                          )
                          (
                           #:data_format? (or/c 'hex 'base64 'utf-8)
-                          #:padding_mode? (or/c 'pkcs5 'zero 'no-padding 'ansix923 'iso10126)
+                          #:padding_mode? (or/c 'pkcs7 'zero 'no-padding 'ansix923 'iso10126)
                           #:operation_mode? (or/c 'ecb 'cbc 'pcbc 'cfb 'ofb)
                           )
                          (cons/c (listof string?) (listof string?)))]
@@ -24,8 +27,11 @@
 
 (define (process-data
          data
+         block_bit_size
+         block_hex_size
+         block_byte_size
          #:data_format? [data_format? 'utf-8]
-         #:padding_mode? [padding_mode? 'pkcs5]
+         #:padding_mode? [padding_mode? 'pkcs7]
          #:operation_mode? [operation_mode? 'cbc])
 
   (detail-div
@@ -61,15 +67,15 @@
      (when
          (and
           (eq? padding_mode? 'no-padding)
-          (not (= (remainder (length data_byte_list) 8) 0))
+          (not (= (remainder (length data_byte_list) block_byte_size) 0))
           (not (eq? operation_mode? 'cfb))
           (not (eq? operation_mode? 'ofb))
           )
-       (error "data length is not 8's"))
+       (error (format "data length is not ~a's" block_byte_size)))
 
      (detail-line "data in hex:")
-     (define data_to_hex_strs (split-string (bytes->hex-string (list->bytes data_byte_list)) 16))
-     (detail-simple-list data_to_hex_strs #:cols_count? 4)
+     (define data_to_hex_strs (split-string (bytes->hex-string (list->bytes data_byte_list)) block_hex_size))
+     (detail-simple-list data_to_hex_strs #:cols_count? 2)
 
      (detail-line (format "padding_mode:[~a]" padding_mode?))
      (detail-line "hex blocks after padding:")
@@ -77,29 +83,29 @@
        (if (and
             (not (eq? operation_mode? 'cfb))
             (not (eq? operation_mode? 'ofb))
-            (not (= (string-length (last data_to_hex_strs)) 16))
+            (not (= (string-length (last data_to_hex_strs)) block_hex_size))
             (not (eq? padding_mode? 'no-padding)))
            (list-set data_to_hex_strs
                      (sub1 (length data_to_hex_strs))
                      (cond
-                      [(eq? padding_mode? 'pkcs5)
-                       (padding-pkcs5 (last data_to_hex_strs) 64)]
+                      [(eq? padding_mode? 'pkcs7)
+                       (padding-pkcs7 (last data_to_hex_strs) block_bit_size)]
                       [(eq? padding_mode? 'zero)
-                       (padding-zero (last data_to_hex_strs) 64)]
+                       (padding-zero (last data_to_hex_strs) block_bit_size)]
                       [(eq? padding_mode? 'ansix923)
-                       (padding-ansix923 (last data_to_hex_strs) 64)]
+                       (padding-ansix923 (last data_to_hex_strs) block_bit_size)]
                       [(eq? padding_mode? 'iso10126)
-                       (padding-iso10126 (last data_to_hex_strs) 64)]
+                       (padding-iso10126 (last data_to_hex_strs) block_bit_size)]
                       ))
            data_to_hex_strs))
-     (detail-simple-list hex_strs_after_padding #:cols_count? 4)
+     (detail-simple-list hex_strs_after_padding #:cols_count? 2)
 
-     (detail-line "64bits blocks after padding:")
-     (define 64bits_blocks_after_padding
+     (detail-line (format "~a bits blocks after padding:" block_bit_size))
+     (define bits_blocks_after_padding
        (map
         (lambda (hex_block)
           (~r #:base 2 #:min-width (* (string-length hex_block) 4) #:pad-string "0" (string->number hex_block 16)))
         hex_strs_after_padding))
-     (detail-simple-list 64bits_blocks_after_padding #:cols_count? 4)
+     (detail-simple-list bits_blocks_after_padding #:cols_count? 1)
 
-  (cons hex_strs_after_padding 64bits_blocks_after_padding))))
+  (cons hex_strs_after_padding bits_blocks_after_padding))))
