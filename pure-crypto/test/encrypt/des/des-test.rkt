@@ -21,7 +21,7 @@
      #f)
 
     (check-equal? 
-     (encrypt "chenxiao" "chensihe" #:operation_mode? 'ecb #:detail? '(console "ecb.pdf"))
+     (encrypt "chenxiao" "chensihe" #:operation_mode? 'ecb)
      "E99DAFFBF097826E")
 
     (check-equal? 
@@ -37,7 +37,7 @@
      "85E813540F0AB405")
 
     (check-equal? 
-     (encrypt "a" "chensihe" #:operation_mode? 'ecb)
+     (encrypt "a" "chensihe" #:operation_mode? 'ecb #:detail? '("detail.pdf"))
      "92165495EDA4824D")
 
     (check-equal? 

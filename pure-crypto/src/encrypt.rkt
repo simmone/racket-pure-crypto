@@ -23,7 +23,7 @@
                      #:encrypted_format? (or/c 'hex 'base64)
                      #:padding_mode? (or/c 'pkcs7 'zero 'no-padding 'ansix923 'iso10126)
                      #:operation_mode? (or/c 'ecb 'cbc 'pcbc 'cfb 'ofb)
-                     #:iv? string?
+                     #:iv? (or/c #f string?)
                      #:detail? (or/c #f (listof (or/c 'raw 'console path-string?)))
                     )
                     (or/c #f string?))]
@@ -37,7 +37,7 @@
          #:encrypted_format? [encrypted_format? 'hex]
          #:padding_mode? [padding_mode? 'pkcs7]
          #:operation_mode? [operation_mode? 'cbc]
-         #:iv? [iv? "0000000000000000"]
+         #:iv? [iv? #f]
          #:detail? [detail? #f]
          )
   (detail 
@@ -67,13 +67,21 @@
           (set! block_hex_size (/ block_bit_size 4))
           (set! block_byte_size (/ block_bit_size 8))
 
+          (when (not iv?)
+            (set! iv?
+                  (cond
+                   [(or (eq? cipher? 'des) (eq? cipher? 'tdes))
+                    "0000000000000000"]
+                   [(eq? cipher? 'aes)
+                    "00000000000000000000000000000000"])))
+             
           (when (not (regexp-match (pregexp (format "^([0-9a-zA-Z]){~a}$" block_hex_size)) iv?))
             (error (format "iv should be in ~a hex format." block_hex_size)))
 
           (detail-line (format "iv:[~a]" iv?))
-          (set! iv_bin (~r #:min-width block_size #:base 2 #:pad-string "0" (string->number iv? 16)))
+          (set! iv_bin (~r #:min-width block_bit_size #:base 2 #:pad-string "0" (string->number iv? 16)))
           (detail-line "iv in binary:")
-          (detail-line iv_bin #:line_break_length 32)
+          (detail-line iv_bin #:line_break_length? 32)
 
           (set! hex_key (to-hex-key key #:cipher? cipher? #:key_format? key_format?))
 
@@ -90,17 +98,22 @@
              #:padding_mode? padding_mode?
              #:operation_mode? operation_mode?))
           (define hex_strs_after_padding (car hex_and_bits))
-          (set! 64bits_blocks_after_padding (cdr hex_and_bits))))
+          (set! bits_blocks_after_padding (cdr hex_and_bits))))
 
        (detail-page
         #:line_break_length? 32
         (lambda ()
           (detail-h2 "Block Processing")
 
-          (let loop ([blocks 64bits_blocks_after_padding]
+          (let loop ([blocks bits_blocks_after_padding]
                      [block_index 1]
                      [last_result iv_bin]
-                     [last_origin_bin (hex-string->binary-string "0000000000000000")]
+                     [last_origin_bin
+                      (cond
+                       [(or (eq? cipher? 'des) (eq? cipher? 'tdes))
+                        (hex-string->binary-string "0000000000000000")]
+                       [(eq? cipher? 'aes)
+                        (hex-string->binary-string "00000000000000000000000000000000")])]
                      [result_list '()])
             (if (not (null? blocks))
                 (let* ([block_binary_data (car blocks)]
@@ -110,7 +123,7 @@
 
                   (detail-line (format "----block index:[~a]----" block_index))
                   (detail-line "block_binary_data:")
-                  (detail-line block_binary_data #:line_break_length? 8)
+                  (detail-line block_binary_data #:line_break_length? 32)
 
                   (cond
                    [(eq? operation_mode? 'ecb)
