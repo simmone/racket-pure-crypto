@@ -15,7 +15,7 @@
                           #:cipher? (or/c 'des 'tdes 'aes)
                           #:key_format? (or/c 'hex 'base64 'utf-8)
                          )
-                         (and/c string? #px"^([0-9]|[A-F])+$"))]
+                         (and/c string? #px"^([0-9]|[a-f])+$"))]
           ))
 
 (define (to-hex-key
@@ -34,14 +34,13 @@
        (detail-line (format "key:[~a][~a]" key key_format?))
        
        (set! hex_key
-             (string-upcase
-              (cond
-               [(eq? key_format? 'utf-8)
-                (bytes->hex-string (string->bytes/utf-8 key))]
-               [(eq? key_format? 'base64)
-                (bytes->hex-string (base64-decode (string->bytes/utf-8 key)))]
-               [else
-                key])))
+             (cond
+              [(eq? key_format? 'utf-8)
+               (bytes->hex-string (string->bytes/utf-8 key))]
+              [(eq? key_format? 'base64)
+               (bytes->hex-string (base64-decode (string->bytes/utf-8 key)))]
+              [else
+               (string-downcase key)]))
 
        (detail-line (format "key in hex:[~a]" hex_key))
 

@@ -106,6 +106,6 @@
         (lambda (hex_block)
           (~r #:base 2 #:min-width (* (string-length hex_block) 4) #:pad-string "0" (string->number hex_block 16)))
         hex_strs_after_padding))
-     (detail-simple-list bits_blocks_after_padding #:cols_count? 1)
+     (detail-simple-list bits_blocks_after_padding #:cols_count? 1 #:col_width? 64)
 
   (cons hex_strs_after_padding bits_blocks_after_padding))))

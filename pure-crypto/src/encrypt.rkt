@@ -161,12 +161,15 @@
                             (set! ed2 (undes e1 (list-ref des_k_lists 1)))
                             (des ed2 (list-ref des_k_lists 2)))]
                          [(eq? cipher? 'aes)
-                          (aes operated_binary_data hex_key)]
+                          (aes
+                           (~r #:base 16 #:min-width block_hex_size #:pad-string "0" (string->number operated_binary_data 2))
+                           hex_key)]
                          ))
 
                   (detail-line "encrypted_block_binary_data:")
                   (detail-line encrypted_block_binary_data #:line_break_length? 64 #:font_size? 'small)
 
+                  (detail-line "result_binary_data:")
                   (set! result_binary_data
                         (cond
                          [(or
@@ -181,13 +184,7 @@
                                 cofb_xor_result))]
                          [else
                           encrypted_block_binary_data]))
-
-                  (when (or
-                         (eq? operation_mode? 'cfb)
-                         (eq? operation_mode? 'ofb))
-
-                    (detail-line "result_binary_data:")
-                    (detail-line result_binary_data))
+                  (detail-line result_binary_data #:line_break_length? 64 #:font_size? 'small)
 
                   (loop
                    (cdr blocks)
@@ -201,28 +198,33 @@
                    (cons
                     result_binary_data
                     result_list)))
-                (let* ([encrypted_binary_data_list (reverse result_list)]
-                       [encrypted_data
+                (let ([encrypted_binary_data_list #f]
+                      [encrypted_data #f]
+                      [final_data #f])
+
+                  (detail-line "encrypted_binary_data_list:")
+                  (set! encrypted_binary_data_list (reverse result_list))
+                  (detail-simple-list encrypted_binary_data_list #:cols_count? 1 #:font_size? 'small)
+
+                  (detail-line "encryted_data:")
+                  (set! encrypted_data
                         (foldr string-append ""
                                (map
                                 (lambda (binary_data)
                                   (string-upcase
                                    (~r #:base 16 #:min-width (/ (string-length binary_data) 4) #:pad-string "0" (string->number binary_data 2))))
-                                encrypted_binary_data_list))]
-                       [final_data
-                        (cond
-                         [(eq? encrypted_format? 'base64)
-                          (bytes->string/utf-8 (base64-encode (hex-string->bytes encrypted_data)))]
-                         [else
-                          encrypted_data])])
-                  (detail-line "encrypted_binary_data_list:")
-                  (detail-simple-list encrypted_binary_data_list #:cols_count? 1 #:font_size? 'small)
-
-                  (detail-line "encryted_hex_data:")
+                                encrypted_binary_data_list)))
                   (detail-line encrypted_data #:line_break_length? 16)
 
                   (detail-line (format "encryted_format?:[~a]" encrypted_format?))
 
+                  (detail-line "final data:")
+                  (set! final_data
+                        (cond
+                         [(eq? encrypted_format? 'base64)
+                          (bytes->string/utf-8 (base64-encode (hex-string->bytes encrypted_data)))]
+                         [else
+                          encrypted_data]))
                   (detail-line final_data #:line_break_length? 16)
 
                   final_data)))))))))
