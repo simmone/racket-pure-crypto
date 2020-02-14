@@ -161,9 +161,12 @@
                             (set! ed2 (undes e1 (list-ref des_k_lists 1)))
                             (des ed2 (list-ref des_k_lists 2)))]
                          [(eq? cipher? 'aes)
-                          (aes
-                           (~r #:base 16 #:min-width block_hex_size #:pad-string "0" (string->number operated_binary_data 2))
-                           hex_key)]
+                          (~r #:base 2 #:min-width 128 #:pad-string "0"
+                              (string->number
+                               (aes
+                                (~r #:base 16 #:min-width 32 #:pad-string "0" (string->number operated_binary_data 2))
+                                hex_key)
+                               16))]
                          ))
 
                   (detail-line "encrypted_block_binary_data:")

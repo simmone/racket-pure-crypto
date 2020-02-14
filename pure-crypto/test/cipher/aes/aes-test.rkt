@@ -15,7 +15,7 @@
 
     (check-equal? 
      (detail 
-      #:formats? '("aes.pdf")
+      #:formats? #f
       (lambda ()
         (detail-page
          (lambda ()

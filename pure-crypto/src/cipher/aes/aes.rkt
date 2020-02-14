@@ -10,15 +10,15 @@
 
 (provide (contract-out
           [aes (->
-                (and/c string? #px"^([0-1]){128}$")
+                (and/c string? #px"^([0-9]|[a-f]){32}$")
                 (and/c string?
                        (or/c #px"^([0-9]|[a-f]){32}$" #px"^([0-9]|[a-f]){48}$" #px"^([0-9]|[a-f]){64}$"))
-                (and/c string? #px"^([0-1]){128}$"))]
+                (and/c string? #px"^([0-9]|[a-f]){32}$"))]
           [unaes (->
-                  (and/c string? #px"^([0-1]){128}$")
+                  (and/c string? #px"^([0-9]|[a-f]){32}$")
                   (and/c string?
                          (or/c #px"^([0-9]|[a-f]){32}$" #px"^([0-9]|[a-f]){48}$" #px"^([0-9]|[a-f]){64}$"))
-                  (and/c string? #px"^([0-1]){128}$"))]
+                  (and/c string? #px"^([0-9]|[a-f]){32}$"))]
           ))
 
 (define (aes block key)
