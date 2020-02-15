@@ -22,7 +22,7 @@
                      #:data_format? (or/c 'hex 'base64 'utf-8)
                      #:encrypted_format? (or/c 'hex 'base64)
                      #:padding_mode? (or/c 'pkcs7 'zero 'no-padding 'ansix923 'iso10126)
-                     #:operation_mode? (or/c 'ecb 'cbc 'pcbc 'cfb 'ofb)
+                     #:operation_mode? (or/c 'ecb 'cbc 'pcbc 'cfb 'ofb 'ctr)
                      #:iv? (or/c #f string?)
                      #:detail? (or/c #f (listof (or/c 'raw 'console path-string?)))
                     )
@@ -130,12 +130,12 @@
                     (set! operated_binary_data block_binary_data)]
                    [(eq? operation_mode? 'cbc)
                     (set! operated_binary_data
-                          (~r #:base 2 #:min-width 64 #:pad-string "0" (bitwise-xor (string->number last_result 2) (string->number block_binary_data 2))))]
+                          (~r #:base 2 #:min-width block_bit_size #:pad-string "0" (bitwise-xor (string->number last_result 2) (string->number block_binary_data 2))))]
                    [(eq? operation_mode? 'pcbc)
                     (set! operated_binary_data
                           (let* ([step1 (bitwise-xor (string->number last_result 2) (string->number last_origin_bin 2))]
                                  [step2 (bitwise-xor (string->number block_binary_data 2) step1)])
-                            (~r #:base 2 #:min-width 64 #:pad-string "0" step2)))]
+                            (~r #:base 2 #:min-width block_bit_size #:pad-string "0" step2)))]
                    [(or
                      (eq? operation_mode? 'cfb)
                      (eq? operation_mode? 'ofb))
@@ -161,7 +161,7 @@
                             (set! ed2 (undes e1 (list-ref des_k_lists 1)))
                             (des ed2 (list-ref des_k_lists 2)))]
                          [(eq? cipher? 'aes)
-                          (~r #:base 2 #:min-width 128 #:pad-string "0"
+                          (~r #:base 2 #:min-width block_bit_size #:pad-string "0"
                               (string->number
                                (aes
                                 (~r #:base 16 #:min-width 32 #:pad-string "0" (string->number operated_binary_data 2))
@@ -178,11 +178,11 @@
                          [(or
                            (eq? operation_mode? 'cfb)
                            (eq? operation_mode? 'ofb))
-                          (let* ([padding_before_xor (~a #:min-width 64 #:right-pad-string "0" block_binary_data)]
+                          (let* ([padding_before_xor (~a #:min-width block_bit_size #:right-pad-string "0" block_binary_data)]
                                  [cofb_xor_result
-                                  (~r #:min-width 64 #:base 2 #:pad-string "0"
+                                  (~r #:min-width block_bit_size #:base 2 #:pad-string "0"
                                       (bitwise-xor (string->number encrypted_block_binary_data 2) (string->number padding_before_xor 2)))])
-                            (if (not (= (string-length block_binary_data) 64))
+                            (if (not (= (string-length block_binary_data) block_bit_size))
                                 (substring cofb_xor_result 0 (string-length block_binary_data))
                                 cofb_xor_result))]
                          [else

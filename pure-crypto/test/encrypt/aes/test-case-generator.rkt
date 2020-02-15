@@ -25,3 +25,7 @@
 (printf "~a\n" (openssl 'plain "enc -aes-192-cbc -nosalt -iv 00000000000000000000000000000000" "a" "chensihehesichenxiaochen"))
 
 (printf "~a\n" (openssl 'plain "enc -aes-192-cbc -nosalt -iv 00000000000000000000000000000000" "chenxiaoxiaochena" "chensihehesichenxiaochen"))
+
+(printf "~a\n" (openssl 'plain "enc -aes-256-cbc -nosalt -iv 00000000000000000000000000000000" "chenxiaoxiaochena" "chensihehesichenxiaochenchenxiao"))
+
+(printf "~a\n" (openssl 'plain "enc -aes-256-ecb -nosalt" "chenxiaoxiaochena" "chensihehesichenxiaochenchenxiao"))

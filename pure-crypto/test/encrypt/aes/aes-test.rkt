@@ -78,6 +78,60 @@
 
     )
 
+   (test-case
+    "test-cbc-256"
+
+    (check-equal?
+     (encrypt #:cipher? 'aes "chenxiaoxiaochena" "chensihehesichenxiaochenchenxiao")
+     "2F1E5BC38EC4736B6D5CCA79859B95BE401410A3BB8E9CDB2507D667DDA81DD1"
+     )
+    )
+   
+   (test-case
+    "test-ecb-256"
+
+    (check-equal?
+     (encrypt #:cipher? 'aes #:operation_mode? 'ecb "chenxiaoxiaochena" "chensihehesichenxiaochenchenxiao")
+     "2F1E5BC38EC4736B6D5CCA79859B95BE29AD707A840DE8F8F69F17C609DA85EA"
+     )
+    )
+
+   (test-case
+    "test-ofb-128"
+    
+    (check-equal?
+     (encrypt #:cipher? 'aes #:operation_mode? 'ofb
+              "chenxiaoxiaochena" "chensihehesichen")
+     "D8308E159E56ED0B24811CE4DF1E0CDB54")
+    )
+
+   (test-case
+    "test-cfb-128"
+    
+    (check-equal?
+     (encrypt #:cipher? 'aes #:operation_mode? 'cfb
+              "chenxiaoxiaochena" "chensihehesichen")
+     "D8308E159E56ED0B24811CE4DF1E0CDBDF")
+    )
+
+   (test-case
+    "test-pcbc-128"
+    
+    (check-equal?
+     (encrypt #:cipher? 'aes #:operation_mode? 'pcbc
+              "chenxiaoxiaochena" "chensihehesichen")
+    "3C0AEADD704C4A2FF227CCB67C2F4F6502C1F73B805A0C031741F9F0D9B6CBFD")
+    )
+
+   (test-case
+    "test-ctr-128"
+    
+    (check-equal?
+     (encrypt #:cipher? 'aes #:operation_mode? 'ctr
+              "chenxiaoxiaochena" "chensihehesichen")
+     "02D9037BCD6C01645363480C9E5D26C146C3DF274DAC32B8656BD4BD00D8770E")
+    )
+
    ))
 
  (run-tests test-encrypt)

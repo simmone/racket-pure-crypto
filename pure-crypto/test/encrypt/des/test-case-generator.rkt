@@ -1,6 +1,6 @@
 #lang racket
 
-(require "../openssl/openssl.rkt")
+(require "../../openssl/openssl.rkt")
 
 (printf "~a\n" (openssl 'hex "enc -des-ecb -nopad -nosalt" "0123456789ABCDEF" "133457799BBCDFF1"))
 
