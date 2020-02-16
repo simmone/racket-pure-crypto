@@ -82,6 +82,18 @@
           (set! iv_bin (~r #:min-width block_bit_size #:base 2 #:pad-string "0" (string->number iv? 16)))
           (detail-line "iv in binary:")
           (detail-line iv_bin #:line_break_length? 32)
+          
+          (when
+              (cond
+               [(or (eq? cipher? 'des) (eq? cipher? 'tdes))
+                (when (not (member operation_mode? '(ecb cbc pcbc cfb ofb)))
+                  #t)]
+               [(eq? cipher? 'aes)
+                (when (not (member operation_mode? '(ecb cbc pcbc cfb ofb ctr)))
+                  #t)]
+               [else
+                #f])
+            (error (format "cipher[~a] can't use this operation_mode[~a]" cipher? operation_mode?)))
 
           (set! hex_key (to-hex-key key #:cipher? cipher? #:key_format? key_format?))
 
