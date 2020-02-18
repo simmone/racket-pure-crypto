@@ -52,7 +52,8 @@
 
     (check-equal?
      (encrypt #:cipher? 'aes #:key_format? 'hex #:data_format? 'hex #:operation_mode? 'ecb
-              "0123456789ABCDEF0123456789ABCDEF" "133457799BBCDFF133457799BBCDFFAB0123456789ABCDEF")
+              "0123456789ABCDEF0123456789ABCDEF"
+              "133457799BBCDFF133457799BBCDFFAB0123456789ABCDEF")
      "C326C015F55309BCD0A6219107969FF0")
 
     (check-equal?
@@ -127,9 +128,13 @@
     "test-ctr-128"
     
     (check-equal?
-     (encrypt #:cipher? 'aes #:operation_mode? 'ctr
-              "chenxiaoxiaochena" "chensihehesichen")
-     "02D9037BCD6C01645363480C9E5D26C146C3DF274DAC32B8656BD4BD00D8770E")
+     (encrypt #:cipher? 'aes #:operation_mode? 'ctr #:data_format? 'hex #:key_format? 'hex
+              #:detail? '(console "detail.pdf")
+              "6BC1BEE22E409F96E93D7E117393172A"
+              "0123456789abcdef0123456789abcdef"
+              "2B7E151628AED2A6ABF7158809CF4F3C"
+              #:iv? "")
+     "3B3FD92EB72DAD20333449F8E83CFB4A")
     )
 
    ))

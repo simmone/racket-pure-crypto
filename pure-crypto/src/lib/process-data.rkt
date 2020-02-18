@@ -20,7 +20,7 @@
                          (
                           #:data_format? (or/c 'hex 'base64 'utf-8)
                           #:padding_mode? (or/c 'pkcs7 'zero 'no-padding 'ansix923 'iso10126)
-                          #:operation_mode? (or/c 'ecb 'cbc 'pcbc 'cfb 'ofb)
+                          #:operation_mode? (or/c 'ecb 'cbc 'pcbc 'cfb 'ofb 'ctr)
                           )
                          (cons/c (listof string?) (listof string?)))]
           ))
@@ -70,6 +70,7 @@
           (not (= (remainder (length data_byte_list) block_byte_size) 0))
           (not (eq? operation_mode? 'cfb))
           (not (eq? operation_mode? 'ofb))
+          (not (eq? operation_mode? 'ctr))
           )
        (error (format "data length is not ~a's" block_byte_size)))
 
@@ -83,6 +84,7 @@
        (if (and
             (not (eq? operation_mode? 'cfb))
             (not (eq? operation_mode? 'ofb))
+            (not (eq? operation_mode? 'ctr))
             (not (= (string-length (last data_to_hex_strs)) block_hex_size))
             (not (eq? padding_mode? 'no-padding)))
            (list-set data_to_hex_strs

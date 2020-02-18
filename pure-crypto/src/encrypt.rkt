@@ -67,6 +67,19 @@
           (set! block_hex_size (/ block_bit_size 4))
           (set! block_byte_size (/ block_bit_size 8))
 
+          (when
+              (not
+               (cond
+                [(or (eq? cipher? 'des) (eq? cipher? 'tdes))
+                 (when (member operation_mode? '(ecb cbc pcbc cfb ofb))
+                   #t)]
+                [(eq? cipher? 'aes)
+                 (when (member operation_mode? '(ecb cbc pcbc cfb ofb ctr))
+                   #t)]
+                [else
+                 #f]))
+            (error (format "cipher[~a] can't use this operation_mode[~a]" cipher? operation_mode?)))
+
           (when (not iv?)
             (set! iv?
                   (cond
@@ -74,27 +87,22 @@
                     "0000000000000000"]
                    [(eq? cipher? 'aes)
                     "00000000000000000000000000000000"])))
-             
-          (when (not (regexp-match (pregexp (format "^([0-9a-zA-Z]){~a}$" block_hex_size)) iv?))
-            (error (format "iv should be in ~a hex format." block_hex_size)))
+
+          (cond
+           [(or (eq? cipher? 'des) (eq? cipher? 'tdes) (eq? operation_mode? 'ctr))
+            (when (not (regexp-match (pregexp "^([0-9a-zA-Z]){16}$") iv?))
+              (error "iv should be in 16 hex format."))]
+           [(eq? cipher? 'aes)
+            (when (not (regexp-match (pregexp "^([0-9a-zA-Z]){32}$") iv?))
+              (error "iv should be in 32 hex format."))])
 
           (detail-line (format "iv:[~a]" iv?))
-          (set! iv_bin (~r #:min-width block_bit_size #:base 2 #:pad-string "0" (string->number iv? 16)))
+          (if (eq? operation_mode? 'ctr)
+              (set! iv_bin (~r #:min-width 64 #:base 2 #:pad-string "0" (string->number iv? 16)))
+              (set! iv_bin (~r #:min-width block_bit_size #:base 2 #:pad-string "0" (string->number iv? 16))))
           (detail-line "iv in binary:")
-          (detail-line iv_bin #:line_break_length? 32)
+          (detail-line iv_bin #:line_break_length? 64)
           
-          (when
-              (cond
-               [(or (eq? cipher? 'des) (eq? cipher? 'tdes))
-                (when (not (member operation_mode? '(ecb cbc pcbc cfb ofb)))
-                  #t)]
-               [(eq? cipher? 'aes)
-                (when (not (member operation_mode? '(ecb cbc pcbc cfb ofb ctr)))
-                  #t)]
-               [else
-                #f])
-            (error (format "cipher[~a] can't use this operation_mode[~a]" cipher? operation_mode?)))
-
           (set! hex_key (to-hex-key key #:cipher? cipher? #:key_format? key_format?))
 
           (when (or (eq? cipher? 'des) (eq? cipher? 'tdes))
@@ -113,7 +121,7 @@
           (set! bits_blocks_after_padding (cdr hex_and_bits))))
 
        (detail-page
-        #:line_break_length? 32
+        #:line_break_length? 64
         (lambda ()
           (detail-h2 "Block Processing")
 
@@ -152,6 +160,9 @@
                      (eq? operation_mode? 'cfb)
                      (eq? operation_mode? 'ofb))
                     (set! operated_binary_data last_result)]
+                   [(eq? operation_mode? 'ctr)
+                    (set! operated_binary_data 
+                          (string-append iv_bin (~r #:base 16 #:min-width 64 #:pad-string "0" block_index)))]
                    [else
                     (set! operated_binary_data block_binary_data)])
 
@@ -189,7 +200,8 @@
                         (cond
                          [(or
                            (eq? operation_mode? 'cfb)
-                           (eq? operation_mode? 'ofb))
+                           (eq? operation_mode? 'ofb)
+                           (eq? operation_mode? 'ctr))
                           (let* ([padding_before_xor (~a #:min-width block_bit_size #:right-pad-string "0" block_binary_data)]
                                  [cofb_xor_result
                                   (~r #:min-width block_bit_size #:base 2 #:pad-string "0"
