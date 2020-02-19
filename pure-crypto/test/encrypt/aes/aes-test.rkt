@@ -131,9 +131,7 @@
      (encrypt #:cipher? 'aes #:operation_mode? 'ctr #:data_format? 'hex #:key_format? 'hex
               #:detail? '(console "detail.pdf")
               "6BC1BEE22E409F96E93D7E117393172A"
-              "0123456789abcdef0123456789abcdef"
-              "2B7E151628AED2A6ABF7158809CF4F3C"
-              #:iv? "")
+              "0123456789abcdef0123456789abcdef")
      "3B3FD92EB72DAD20333449F8E83CFB4A")
     )
 

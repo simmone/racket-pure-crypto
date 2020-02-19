@@ -83,7 +83,7 @@
           (when (not iv?)
             (set! iv?
                   (cond
-                   [(or (eq? cipher? 'des) (eq? cipher? 'tdes))
+                   [(or (eq? cipher? 'des) (eq? cipher? 'tdes) (eq? operation_mode? 'ctr))
                     "0000000000000000"]
                    [(eq? cipher? 'aes)
                     "00000000000000000000000000000000"])))
@@ -162,7 +162,7 @@
                     (set! operated_binary_data last_result)]
                    [(eq? operation_mode? 'ctr)
                     (set! operated_binary_data 
-                          (string-append iv_bin (~r #:base 16 #:min-width 64 #:pad-string "0" block_index)))]
+                          (string-append iv_bin (~r #:base 16 #:min-width 64 #:pad-string "0" (sub1 block_index))))]
                    [else
                     (set! operated_binary_data block_binary_data)])
 
