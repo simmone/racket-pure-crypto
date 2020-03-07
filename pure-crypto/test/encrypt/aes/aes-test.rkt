@@ -9,17 +9,17 @@
   (test-suite
    "test-encrypt"
 
+   ;; AES-ECB-128
    (test-case
     "test-ecb-128"
 
-    ;; TEST-CASE: AES-ECB-128 HEX:HEX:HEX
+
     (check-equal?
      (encrypt #:cipher? 'aes "0123456789ABCDEF0123456789ABCDEF" "133457799BBCDFF133457799BBCDFFAB"
               #:operation_mode? 'ecb #:data_format? 'hex #:key_format? 'hex)
      "4AE08C70BEA1D25577F34EF92877F787"
     )
 
-    ;; NIXT: ECB-AES128 HEX:HEX:HEX
     (check-equal?
      (encrypt #:cipher? 'aes #:operation_mode? 'ecb #:data_format? 'hex #:key_format? 'hex
               (string-append
@@ -33,7 +33,13 @@
       "F5D3D58503B9699DE785895A96FDBAAF"
       "43B1CD7F598ECE23881B00E3ED030688"
       "7B0C785E27E8AD3F8223207104725DD4")
+     )
+
     )
+   
+   ;; TEXT-CASE: CBC-128 PlAIN:PLAIN:HEX
+   (test-case
+    "test-cbc-128"
 
     (check-equal?
      (encrypt #:cipher? 'aes "chenxiaoxiaochen" "chensihehesichen")
@@ -42,10 +48,6 @@
     (check-equal?
      (encrypt #:cipher? 'aes "a" "chensihehesichen")
      "260C2109180E3B4DE5211ADB02660079")
-    )
-   
-   (test-case
-    "test-cbc-128"
     
     (check-equal?
      (encrypt #:cipher? 'aes "a" "chensihehesichen")
@@ -72,6 +74,21 @@
               "0123456789ABCDEF0123456789ABCDEF"
               "133457799BBCDFF133457799BBCDFFAB0123456789ABCDEF")
      "C326C015F55309BCD0A6219107969FF0")
+
+    (check-equal?
+     (encrypt #:cipher? 'aes #:key_format? 'hex #:data_format? 'hex #:operation_mode? 'ecb
+              (string-append
+               "6bc1bee22e409f96e93d7e117393172a"
+               "ae2d8a571e03ac9c9eb76fac45af8e51"
+               "30c81c46a35ce411e5fbc1191a0a52ef"
+               "f69f2445df4f9b17ad2b417be66c3710")
+              "8e73b0f7da0e6452c810f32b809079e562f8ead2522c6b7b")
+
+     (string-append
+      "BD334F1D6E45F25FF712A214571FA5CC"
+      "974104846D0AD3AD7734ECB3ECEE4EEF"
+      "EF7AFD2270E2E60ADCE0BA2FACE6444E"
+      "9A4B41BA738D6C72FB16691603C18E0E"))
 
     (check-equal?
      (encrypt #:cipher? 'aes "chenxiaoxiaochen" "chensihehesichenxiaochen")
