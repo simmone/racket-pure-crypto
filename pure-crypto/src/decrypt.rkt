@@ -42,34 +42,83 @@
   (detail 
    #:formats? detail?
    #:exception_value? #f
+   #:font_size? 'small
+   #:line_break_length? 64
    (lambda ()
 
-     (let ([k_lists #f]
+     (let ([des_k_lists #f]
+           [hex_key #f]
            [iv_bin #f]
-           [64bits_blocks_after_padding #f])
+           [block_bit_size #f]
+           [block_hex_size #f]
+           [block_byte_size #f]
+           [bits_blocks_after_padding #f])
 
      (detail-page
       (lambda ()
-        (detail-h1 "Decryption Detail")
+        (detail-h1 (format "~a Decryption Detail" (string-upcase (symbol->string cipher?))))
 
-        (define key_and_iv (process-key key #:iv? iv? #:key_format? key_format?))
+        (set! block_bit_size 
+              (cond
+               [(or (eq? cipher? 'des) (eq? cipher? 'tdes))
+                64]
+               [(eq? cipher? 'aes)
+                128]))
+        (detail-line (format "block_bit_size:[~a]" block_bit_size))
+        (set! block_hex_size (/ block_bit_size 4))
+        (set! block_byte_size (/ block_bit_size 8))
 
-        (set! k_lists (car key_and_iv))
-        (set! iv_bin (cdr key_and_iv))
-  
-        (define hex_and_bits
-          (process-data 
+        (when
+            (not
+             (cond
+              [(or (eq? cipher? 'des) (eq? cipher? 'tdes))
+               (when (member operation_mode? '(ecb cbc pcbc cfb ofb))
+                 #t)]
+              [(eq? cipher? 'aes)
+               (when (member operation_mode? '(ecb cbc pcbc cfb ofb ctr))
+                 #t)]
+              [else
+               #f]))
+          (error (format "cipher[~a] can't use this operation_mode[~a]" cipher? operation_mode?)))
+
+        (when (not iv?)
+          (set! iv?
+                (cond
+                 [(or (eq? cipher? 'des) (eq? cipher? 'tdes))
+                  "0000000000000000"]
+                 [(eq? cipher? 'aes)
+                  "00000000000000000000000000000000"])))
+
+        (cond
+         [(or (eq? cipher? 'des) (eq? cipher? 'tdes))
+          (when (not (regexp-match (pregexp "^([0-9a-zA-Z]){16}$") iv?))
+            (error "iv should be in 16 hex format."))]
+         [(eq? cipher? 'aes)
+          (when (not (regexp-match (pregexp "^([0-9a-zA-Z]){32}$") iv?))
+            (error "iv should be in 32 hex format."))])
+
+        (detail-line (format "iv:[~a]" iv?))
+        (set! iv_bin (~r #:min-width block_bit_size #:base 2 #:pad-string "0" (string->number iv? 16)))
+        (detail-line "iv in binary:")
+        (detail-line iv_bin #:line_break_length? 64)
+        
+        (set! hex_key (to-hex-key key #:cipher? cipher? #:key_format? key_format?))
+
+        (when (or (eq? cipher? 'des) (eq? cipher? 'tdes))
+          (set! des_k_lists (des-key-lists key #:key_format? key_format?)))
+
+        (define hex_and_bits 
+          (process-data
            data
-           #:data_format? encrypted_format?
+           block_bit_size
+           block_hex_size
+           block_byte_size
+           #:data_format? data_format?
            #:padding_mode? padding_mode?
            #:operation_mode? operation_mode?))
-
         (define hex_strs_after_padding (car hex_and_bits))
-        (set! 64bits_blocks_after_padding (cdr hex_and_bits))))
+        (set! bits_blocks_after_padding (cdr hex_and_bits))
 
-     (detail-page
-      #:line_break_length 32
-      (lambda ()
         (detail-h2 "Block Processing")
 
         (let loop ([loop_blocks 64bits_blocks_after_padding]

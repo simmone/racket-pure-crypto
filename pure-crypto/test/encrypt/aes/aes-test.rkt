@@ -35,7 +35,64 @@
      )
 
     )
-   
+
+   (test-case
+    "test-ecb-192"
+
+    (check-equal?
+     (encrypt #:cipher? 'aes #:key_format? 'hex #:data_format? 'hex #:operation_mode? 'ecb
+              "0123456789ABCDEF0123456789ABCDEF"
+              "133457799BBCDFF133457799BBCDFFAB0123456789ABCDEF")
+     "C326C015F55309BCD0A6219107969FF0")
+
+    (check-equal?
+     (encrypt #:cipher? 'aes #:key_format? 'hex #:data_format? 'hex #:operation_mode? 'ecb
+              (string-append
+               "6bc1bee22e409f96e93d7e117393172a"
+               "ae2d8a571e03ac9c9eb76fac45af8e51"
+               "30c81c46a35ce411e5fbc1191a0a52ef"
+               "f69f2445df4f9b17ad2b417be66c3710")
+              "8e73b0f7da0e6452c810f32b809079e562f8ead2522c6b7b")
+
+     (string-append
+      "BD334F1D6E45F25FF712A214571FA5CC"
+      "974104846D0AD3AD7734ECB3ECEE4EEF"
+      "EF7AFD2270E2E60ADCE0BA2FACE6444E"
+      "9A4B41BA738D6C72FB16691603C18E0E"))
+
+    (check-equal?
+     (encrypt #:cipher? 'aes "chenxiaoxiaochen" "chensihehesichenxiaochen")
+     "4925EA049EB1129593CDA1C980EBFD41")
+
+    (check-equal?
+     (encrypt #:cipher? 'aes "a" "chensihehesichenxiaochen")
+     "1A5DF9AB8B6D5278A3859029FBD7305D")
+
+    )
+
+   (test-case
+    "test-ecb-256"
+
+    (check-equal?
+     (encrypt #:cipher? 'aes #:operation_mode? 'ecb "chenxiaoxiaochena" "chensihehesichenxiaochenchenxiao")
+     "2F1E5BC38EC4736B6D5CCA79859B95BE29AD707A840DE8F8F69F17C609DA85EA"
+     )
+
+    (check-equal?
+     (encrypt #:cipher? 'aes #:operation_mode? 'ecb #:data_format? 'hex #:key_format? 'hex
+              (string-append
+               "6bc1bee22e409f96e93d7e117393172a"
+               "ae2d8a571e03ac9c9eb76fac45af8e51"
+               "30c81c46a35ce411e5fbc1191a0a52ef"
+               "f69f2445df4f9b17ad2b417be66c3710")
+              "603deb1015ca71be2b73aef0857d77811f352c073b6108d72d9810a30914dff4")
+     (string-append
+      "F3EED1BDB5D2A03C064B5A7E3DB181F8"
+      "591CCB10D410ED26DC5BA74A31362870"
+      "B6ED21B99CA6F4F9F153E7B1BEAFED1D"
+      "23304B7A39F9F3FF067D8D8F9E24ECC7"))
+    )
+
    (test-case
     "test-cbc-128"
 
@@ -73,40 +130,6 @@
       "5086CB9B507219EE95DB113A917678B2"
       "73BED6B8E3C1743B7116E69E22229516"
       "3FF1CAA1681FAC09120ECA307586E1A7"))
-    )
-
-   (test-case
-    "test-ecb-192"
-
-    (check-equal?
-     (encrypt #:cipher? 'aes #:key_format? 'hex #:data_format? 'hex #:operation_mode? 'ecb
-              "0123456789ABCDEF0123456789ABCDEF"
-              "133457799BBCDFF133457799BBCDFFAB0123456789ABCDEF")
-     "C326C015F55309BCD0A6219107969FF0")
-
-    (check-equal?
-     (encrypt #:cipher? 'aes #:key_format? 'hex #:data_format? 'hex #:operation_mode? 'ecb
-              (string-append
-               "6bc1bee22e409f96e93d7e117393172a"
-               "ae2d8a571e03ac9c9eb76fac45af8e51"
-               "30c81c46a35ce411e5fbc1191a0a52ef"
-               "f69f2445df4f9b17ad2b417be66c3710")
-              "8e73b0f7da0e6452c810f32b809079e562f8ead2522c6b7b")
-
-     (string-append
-      "BD334F1D6E45F25FF712A214571FA5CC"
-      "974104846D0AD3AD7734ECB3ECEE4EEF"
-      "EF7AFD2270E2E60ADCE0BA2FACE6444E"
-      "9A4B41BA738D6C72FB16691603C18E0E"))
-
-    (check-equal?
-     (encrypt #:cipher? 'aes "chenxiaoxiaochen" "chensihehesichenxiaochen")
-     "4925EA049EB1129593CDA1C980EBFD41")
-
-    (check-equal?
-     (encrypt #:cipher? 'aes "a" "chensihehesichenxiaochen")
-     "1A5DF9AB8B6D5278A3859029FBD7305D")
-
     )
 
    (test-case
@@ -162,29 +185,6 @@
 
     )
    
-   (test-case
-    "test-ecb-256"
-
-    (check-equal?
-     (encrypt #:cipher? 'aes #:operation_mode? 'ecb "chenxiaoxiaochena" "chensihehesichenxiaochenchenxiao")
-     "2F1E5BC38EC4736B6D5CCA79859B95BE29AD707A840DE8F8F69F17C609DA85EA"
-     )
-
-    (check-equal?
-     (encrypt #:cipher? 'aes #:operation_mode? 'ecb #:data_format? 'hex #:key_format? 'hex
-              (string-append
-               "6bc1bee22e409f96e93d7e117393172a"
-               "ae2d8a571e03ac9c9eb76fac45af8e51"
-               "30c81c46a35ce411e5fbc1191a0a52ef"
-               "f69f2445df4f9b17ad2b417be66c3710")
-              "603deb1015ca71be2b73aef0857d77811f352c073b6108d72d9810a30914dff4")
-     (string-append
-      "F3EED1BDB5D2A03C064B5A7E3DB181F8"
-      "591CCB10D410ED26DC5BA74A31362870"
-      "B6ED21B99CA6F4F9F153E7B1BEAFED1D"
-      "23304B7A39F9F3FF067D8D8F9E24ECC7"))
-    )
-
    (test-case
     "test-ofb-128"
     
