@@ -36,7 +36,7 @@
 
   (detail-div
    #:font_size? 'small
-   #:line_break_length? 100
+   #:line_break_length? 64
    (lambda ()
      (detail-h2 "Prepare Data")
 

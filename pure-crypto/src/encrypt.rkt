@@ -43,6 +43,7 @@
   (detail 
    #:formats? detail?
    #:exception_value? #f
+   #:font_size? 'small
    (lambda ()
 
      (let ([des_k_lists #f]
@@ -83,13 +84,13 @@
           (when (not iv?)
             (set! iv?
                   (cond
-                   [(or (eq? cipher? 'des) (eq? cipher? 'tdes) (eq? operation_mode? 'ctr))
+                   [(or (eq? cipher? 'des) (eq? cipher? 'tdes))
                     "0000000000000000"]
                    [(eq? cipher? 'aes)
                     "00000000000000000000000000000000"])))
 
           (cond
-           [(or (eq? cipher? 'des) (eq? cipher? 'tdes) (eq? operation_mode? 'ctr))
+           [(or (eq? cipher? 'des) (eq? cipher? 'tdes))
             (when (not (regexp-match (pregexp "^([0-9a-zA-Z]){16}$") iv?))
               (error "iv should be in 16 hex format."))]
            [(eq? cipher? 'aes)
@@ -97,9 +98,7 @@
               (error "iv should be in 32 hex format."))])
 
           (detail-line (format "iv:[~a]" iv?))
-          (if (eq? operation_mode? 'ctr)
-              (set! iv_bin (~r #:min-width 64 #:base 2 #:pad-string "0" (string->number iv? 16)))
-              (set! iv_bin (~r #:min-width block_bit_size #:base 2 #:pad-string "0" (string->number iv? 16))))
+          (set! iv_bin (~r #:min-width block_bit_size #:base 2 #:pad-string "0" (string->number iv? 16)))
           (detail-line "iv in binary:")
           (detail-line iv_bin #:line_break_length? 64)
           
@@ -118,11 +117,8 @@
              #:padding_mode? padding_mode?
              #:operation_mode? operation_mode?))
           (define hex_strs_after_padding (car hex_and_bits))
-          (set! bits_blocks_after_padding (cdr hex_and_bits))))
+          (set! bits_blocks_after_padding (cdr hex_and_bits))
 
-       (detail-page
-        #:line_break_length? 64
-        (lambda ()
           (detail-h2 "Block Processing")
 
           (let loop ([blocks bits_blocks_after_padding]
@@ -158,11 +154,10 @@
                             (~r #:base 2 #:min-width block_bit_size #:pad-string "0" step2)))]
                    [(or
                      (eq? operation_mode? 'cfb)
-                     (eq? operation_mode? 'ofb))
+                     (eq? operation_mode? 'ofb)
+                     (eq? operation_mode? 'ctr)
+                     )
                     (set! operated_binary_data last_result)]
-                   [(eq? operation_mode? 'ctr)
-                    (set! operated_binary_data 
-                          (string-append iv_bin (~r #:base 16 #:min-width 64 #:pad-string "0" (sub1 block_index))))]
                    [else
                     (set! operated_binary_data block_binary_data)])
 
@@ -219,6 +214,9 @@
                    (cond
                     [(eq? operation_mode? 'ofb)
                      encrypted_block_binary_data]
+                    [(eq? operation_mode? 'ctr)
+                     (~r #:min-width block_bit_size #:base 2 #:pad-string "0"
+                         (+ (string->number iv_bin 2) block_index))]
                     [else
                      result_binary_data])
                    block_binary_data

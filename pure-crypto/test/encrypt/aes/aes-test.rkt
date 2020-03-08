@@ -339,6 +339,44 @@
       "1E031DDA2FBE03D1792170A0F3009CEE"))
     )
 
+   (test-case
+    "test-ctr-192"
+    
+    (check-equal?
+     (encrypt #:cipher? 'aes #:key_format? 'hex #:data_format? 'hex #:operation_mode? 'ctr
+              #:iv? "f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff"
+              (string-append
+               "6bc1bee22e409f96e93d7e117393172a"
+               "ae2d8a571e03ac9c9eb76fac45af8e51"
+               "30c81c46a35ce411e5fbc1191a0a52ef"
+               "f69f2445df4f9b17ad2b417be66c3710")
+              "8E73B0F7DA0E6452C810F32B809079E562F8EAD2522C6B7B")
+     (string-append
+      "1ABC932417521CA24F2B0459FE7E6E0B"
+      "090339EC0AA6FAEFD5CCC2C6F4CE8E94"
+      "1E36B26BD1EBC670D1BD1D665620ABF7"
+      "4F78A7F6D29809585A97DAEC58C6B050"))
+    )
+
+   (test-case
+    "test-ctr-256"
+    
+    (check-equal?
+     (encrypt #:cipher? 'aes #:key_format? 'hex #:data_format? 'hex #:operation_mode? 'ctr
+              #:iv? "f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff"
+              (string-append
+               "6bc1bee22e409f96e93d7e117393172a"
+               "ae2d8a571e03ac9c9eb76fac45af8e51"
+               "30c81c46a35ce411e5fbc1191a0a52ef"
+               "f69f2445df4f9b17ad2b417be66c3710")
+              "603deb1015ca71be2b73aef0857d77811f352c073b6108d72d9810a30914dff4")
+     (string-append
+      "601EC313775789A5B7A7F504BBF3D228"
+      "F443E3CA4D62B59ACA84E990CACAF5C5"
+      "2B0930DAA23DE94CE87017BA2D84988D"
+      "DFC9C58DB67AADA613C2DD08457941A6"))
+    )
+
    ))
 
  (run-tests test-encrypt)
