@@ -6,10 +6,11 @@
 (require "lib/constants.rkt")
 (require "lib/lib.rkt")
 (require "lib/padding.rkt")
-(require "lib/process-key.rkt")
+(require "lib/to-hex-key.rkt")
 (require "lib/process-data.rkt")
-(require "cipher/undes.rkt")
-(require "cipher/des.rkt")
+(require "cipher/des/des.rkt")
+(require "cipher/des/des-key-lists.rkt")
+(require "cipher/aes/aes.rkt")
 
 (require "../../../racket-detail/detail/main.rkt")
 
@@ -20,7 +21,7 @@
                        #:key_format? (or/c 'hex 'base64 'utf-8)
                        #:data_format? (or/c 'hex 'base64 'utf-8)
                        #:encrypted_format? (or/c 'hex 'base64)
-                       #:padding_mode? (or/c 'pkcs5 'zero 'no-padding 'ansix923 'iso10126)
+                       #:padding_mode? (or/c 'pkcs7 'zero 'no-padding 'ansix923 'iso10126)
                        #:operation_mode? (or/c 'ecb 'cbc 'pcbc 'cfb 'ofb)
                        #:iv? string?
                        #:detail? (or/c #f (listof (or/c 'raw 'console path-string?)))
@@ -33,9 +34,9 @@
                #:key_format? [key_format? 'utf-8]
                #:data_format? [data_format? 'utf-8]
                #:encrypted_format? [encrypted_format? 'hex]
-               #:padding_mode? [padding_mode? 'pkcs5]
+               #:padding_mode? [padding_mode? 'pkcs7]
                #:operation_mode? [operation_mode? 'cbc]
-               #:iv? [iv? "0000000000000000"]
+               #:iv? [iv? #f]
                #:detail? [detail? #f]
                )
 
@@ -114,14 +115,14 @@
            block_hex_size
            block_byte_size
            #:data_format? data_format?
-           #:padding_mode? padding_mode?
+           #:padding_mode? 'no-padding
            #:operation_mode? operation_mode?))
         (define hex_strs_after_padding (car hex_and_bits))
         (set! bits_blocks_after_padding (cdr hex_and_bits))
 
         (detail-h2 "Block Processing")
 
-        (let loop ([loop_blocks 64bits_blocks_after_padding]
+        (let loop ([loop_blocks bits_blocks_after_padding]
                    [block_index 1]
                    [last_factor iv_bin]
                    [result_list '()])
@@ -144,20 +145,38 @@
                       (if (or
                            (eq? operation_mode? 'cfb)
                            (eq? operation_mode? 'ofb))
-                          (if (eq? cipher? 'des)
-                              (des last_factor (list-ref k_lists 0))
-                              (let ([e1 #f]
-                                    [ed2 #f])
-                                (set! e1 (des last_factor (list-ref k_lists 0)))
-                                (set! ed2 (undes e1 (list-ref k_lists 1)))
-                                (des ed2 (list-ref k_lists 2))))
-                          (if (eq? cipher? 'des)
-                              (undes encrypted_block_data (list-ref k_lists 0))
-                              (let ([d1 #f]
-                                    [de2 #f])
-                                (set! d1 (undes encrypted_block_data (list-ref k_lists 2)))
-                                (set! de2 (des d1 (list-ref k_lists 1)))
-                                (undes de2 (list-ref k_lists 0))))))
+                          (cond
+                           [(eq? cipher? 'des)
+                            (des last_factor (list-ref des_k_lists 0))]
+                           [(eq? cipher? 'tdes)
+                            (let ([e1 #f]
+                                  [ed2 #f])
+                              (set! e1 (des last_factor (list-ref des_k_lists 0)))
+                              (set! ed2 (undes e1 (list-ref des_k_lists 1)))
+                              (des ed2 (list-ref des_k_lists 2)))]
+                           [(eq? cipher? 'aes)
+                            (~r #:base 2 #:min-width block_bit_size #:pad-string "0"
+                                (string->number
+                                 (aes
+                                  (~r #:base 16 #:min-width 32 #:pad-string "0" (string->number last_factor 2))
+                                  hex_key)
+                                 16))])
+                          (cond
+                           [(eq? cipher? 'des)
+                            (undes encrypted_block_data (list-ref des_k_lists 0))]
+                           [(eq? cipher? 'tdes)
+                            (let ([e1 #f]
+                                  [ed2 #f])
+                              (set! e1 (undes encrypted_block_data (list-ref des_k_lists 0)))
+                              (set! ed2 (des e1 (list-ref des_k_lists 1)))
+                              (undes ed2 (list-ref des_k_lists 2)))]
+                           [(eq? cipher? 'aes)
+                            (~r #:base 2 #:min-width block_bit_size #:pad-string "0"
+                                (string->number
+                                 (unaes
+                                  (~r #:base 16 #:min-width 32 #:pad-string "0" (string->number encrypted_block_data 2))
+                                  hex_key)
+                                 16))])))
                 (detail-line decrypted_block_data)
 
                 (detail-line "operated_decrypted_block_data:")
@@ -226,8 +245,8 @@
                       (list-set decrypted_data_hex_strs
                                 (sub1 (length decrypted_data_hex_strs))
                                 (cond
-                                 [(eq? padding_mode? 'pkcs5)
-                                  (unpadding-pkcs5 (last decrypted_data_hex_strs) 64)]
+                                 [(eq? padding_mode? 'pkcs7)
+                                  (unpadding-pkcs7 (last decrypted_data_hex_strs) 64)]
                                  [(eq? padding_mode? 'zero)
                                   (unpadding-zero (last decrypted_data_hex_strs) 64)]
                                  [(eq? padding_mode? 'ansix923)

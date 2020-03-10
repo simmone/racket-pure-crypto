@@ -12,7 +12,6 @@
    (test-case
     "test-ecb-128"
 
-
     (check-equal?
      (encrypt #:cipher? 'aes "0123456789ABCDEF0123456789ABCDEF" "133457799BBCDFF133457799BBCDFFAB"
               #:operation_mode? 'ecb #:data_format? 'hex #:key_format? 'hex)
@@ -61,11 +60,13 @@
       "9A4B41BA738D6C72FB16691603C18E0E"))
 
     (check-equal?
-     (encrypt #:cipher? 'aes "chenxiaoxiaochen" "chensihehesichenxiaochen")
+     (encrypt #:cipher? 'aes #:operation_mode? 'ecb
+              "chenxiaoxiaochen" "chensihehesichenxiaochen")
      "4925EA049EB1129593CDA1C980EBFD41")
 
     (check-equal?
-     (encrypt #:cipher? 'aes "a" "chensihehesichenxiaochen")
+     (encrypt #:cipher? 'aes #:operation_mode? 'ecb
+              "a" "chensihehesichenxiaochen")
      "1A5DF9AB8B6D5278A3859029FBD7305D")
 
     )
