@@ -28,8 +28,9 @@
          (repeat-number need_padding_count)))
       hex_str))
 
-(define (unpadding-pkcs7 hex_str block_bit_size)
-  (let ([hex_list (split-string hex_str 2)])
+(define (unpadding-pkcs7 origin_hex_str block_bit_size)
+  (let* ([hex_str (string-downcase origin_hex_str)]
+         [hex_list (split-string hex_str 2)])
     (let ([padding_number (string->number (last hex_list) 16)])
       (if (<= padding_number (/ block_bit_size 8))
           (let ([expect_padding_string (repeat-number padding_number)])

@@ -89,15 +89,9 @@
                    [(eq? cipher? 'aes)
                     "00000000000000000000000000000000"])))
 
-          (cond
-           [(or (eq? cipher? 'des) (eq? cipher? 'tdes))
-            (when (not (regexp-match (pregexp "^([0-9a-zA-Z]){16}$") iv?))
-              (error "iv should be in 16 hex format."))]
-           [(eq? cipher? 'aes)
-            (when (not (regexp-match (pregexp "^([0-9a-zA-Z]){32}$") iv?))
-              (error "iv should be in 32 hex format."))])
+          (when (not (regexp-match (pregexp (format "^([0-9a-zA-Z]){~a}$" block_hex_size)) iv?))
+            (error (format "iv should be in ~a hex format." block_hex_size)))
 
-          (detail-line (format "iv:[~a]" iv?))
           (set! iv_bin (~r #:min-width block_bit_size #:base 2 #:pad-string "0" (string->number iv? 16)))
           (detail-line "iv in binary:")
           (detail-line iv_bin #:line_break_length? 64)

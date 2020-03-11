@@ -53,6 +53,10 @@
      "01")
 
     (check-equal? 
+     (unpadding-pkcs7 "610F0F0F0F0F0F0F0F0F0F0F0F0F0F0F" 128)
+     "61")
+
+    (check-equal? 
      (unpadding-pkcs7 "0102030405060708" 64)
      "0102030405060708")
 

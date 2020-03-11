@@ -90,13 +90,8 @@
                  [(eq? cipher? 'aes)
                   "00000000000000000000000000000000"])))
 
-        (cond
-         [(or (eq? cipher? 'des) (eq? cipher? 'tdes))
-          (when (not (regexp-match (pregexp "^([0-9a-zA-Z]){16}$") iv?))
-            (error "iv should be in 16 hex format."))]
-         [(eq? cipher? 'aes)
-          (when (not (regexp-match (pregexp "^([0-9a-zA-Z]){32}$") iv?))
-            (error "iv should be in 32 hex format."))])
+        (when (not (regexp-match (pregexp (format "^([0-9a-zA-Z]){~a}$" block_hex_size)) iv?))
+          (error (format "iv should be in ~a hex format." block_hex_size)))
 
         (detail-line (format "iv:[~a]" iv?))
         (set! iv_bin (~r #:min-width block_bit_size #:base 2 #:pad-string "0" (string->number iv? 16)))
@@ -114,7 +109,7 @@
            block_bit_size
            block_hex_size
            block_byte_size
-           #:data_format? data_format?
+           #:data_format? encrypted_format?
            #:padding_mode? 'no-padding
            #:operation_mode? operation_mode?))
         (define hex_strs_after_padding (car hex_and_bits))
@@ -235,24 +230,24 @@
                 (detail-line "decrypted_data_hex_strs:")
                 (detail-simple-list decrypted_data_hex_strs #:cols_count? 1 #:font_size? 'small)
 
-                (detail-line "hex_strs_after_remove_padding:")
+                (detail-line (format "hex_strs_after_remove_padding:[~a]" padding_mode?))
                 (define hex_strs_after_remove_padding
                   (if (and
                        (not (eq? operation_mode? 'cfb))
                        (not (eq? operation_mode? 'ofb))
-                       (= (string-length (last decrypted_data_hex_strs)) 16)
+                       (= (string-length (last decrypted_data_hex_strs)) block_hex_size)
                        (not (eq? padding_mode? 'no-padding)))
                       (list-set decrypted_data_hex_strs
                                 (sub1 (length decrypted_data_hex_strs))
                                 (cond
                                  [(eq? padding_mode? 'pkcs7)
-                                  (unpadding-pkcs7 (last decrypted_data_hex_strs) 64)]
+                                  (unpadding-pkcs7 (last decrypted_data_hex_strs) block_bit_size)]
                                  [(eq? padding_mode? 'zero)
-                                  (unpadding-zero (last decrypted_data_hex_strs) 64)]
+                                  (unpadding-zero (last decrypted_data_hex_strs) block_bit_size)]
                                  [(eq? padding_mode? 'ansix923)
-                                  (unpadding-ansix923 (last decrypted_data_hex_strs) 64)]
+                                  (unpadding-ansix923 (last decrypted_data_hex_strs) block_bit_size)]
                                  [(eq? padding_mode? 'iso10126)
-                                  (unpadding-iso10126 (last decrypted_data_hex_strs) 64)]
+                                  (unpadding-iso10126 (last decrypted_data_hex_strs) block_bit_size)]
                                  ))
                       decrypted_data_hex_strs))
                 (detail-simple-list hex_strs_after_remove_padding #:cols_count? 1 #:font_size? 'small)
