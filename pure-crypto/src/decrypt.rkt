@@ -144,11 +144,11 @@
                            [(eq? cipher? 'des)
                             (des last_factor (list-ref des_k_lists 0))]
                            [(eq? cipher? 'tdes)
-                            (let ([e1 #f]
-                                  [ed2 #f])
-                              (set! e1 (des last_factor (list-ref des_k_lists 0)))
-                              (set! ed2 (undes e1 (list-ref des_k_lists 1)))
-                              (des ed2 (list-ref des_k_lists 2)))]
+                            (let ([d1 #f]
+                                  [de2 #f])
+                              (set! d1 (undes last_factor (list-ref des_k_lists 2)))
+                              (set! de2 (des d1 (list-ref des_k_lists 1)))
+                              (undes de2 (list-ref des_k_lists 0)))]
                            [(eq? cipher? 'aes)
                             (~r #:base 2 #:min-width block_bit_size #:pad-string "0"
                                 (string->number
@@ -162,9 +162,9 @@
                            [(eq? cipher? 'tdes)
                             (let ([e1 #f]
                                   [ed2 #f])
-                              (set! e1 (undes encrypted_block_data (list-ref des_k_lists 0)))
+                              (set! e1 (undes encrypted_block_data (list-ref des_k_lists 2)))
                               (set! ed2 (des e1 (list-ref des_k_lists 1)))
-                              (undes ed2 (list-ref des_k_lists 2)))]
+                              (undes ed2 (list-ref des_k_lists 0)))]
                            [(eq? cipher? 'aes)
                             (~r #:base 2 #:min-width block_bit_size #:pad-string "0"
                                 (string->number
@@ -256,7 +256,7 @@
                        [final_data #f])
                   
                   (detail-line "decrypted_hex_data:")
-                  (set! decrypted_hex_data (foldr string-append "" hex_strs_after_remove_padding))
+                  (set! decrypted_hex_data (string-downcase (foldr string-append "" hex_strs_after_remove_padding)))
                   (detail-line decrypted_hex_data #:line_break_length? 16)
                   
                   (detail-line "final data:")

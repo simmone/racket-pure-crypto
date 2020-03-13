@@ -3,7 +3,7 @@
 (require rackunit)
 (require rackunit/text-ui)
 
-(require "../../src/decrypt.rkt")
+(require "../../../src/decrypt.rkt")
 
 (define test-des
   (test-suite
@@ -17,7 +17,6 @@
       "E99DAFFBF097826E"
       "chensihe"
       #:operation_mode? 'ecb
-      #:detail? '(console "ecb.pdf")
       )
       "chenxiao"
      )
@@ -26,7 +25,7 @@
      (decrypt
       "85E813540F0AB405"
       "133457799BBCDFF1" #:operation_mode? 'ecb #:data_format? 'hex #:key_format? 'hex)
-      "0123456789ABCDEF"
+      "0123456789abcdef"
      )
 
     (check-equal? 
@@ -92,7 +91,7 @@
       #:operation_mode? 'pcbc
       #:iv? "86dae6d37a7c8a34"
       )
-     "6368656E7869616F6368656E6D696E6368656E7469616E7A68656E"
+     "6368656e7869616f6368656e6d696e6368656e7469616e7a68656e"
      )
     )
 

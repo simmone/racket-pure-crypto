@@ -21,7 +21,9 @@
      #f)
 
     (check-equal? 
-     (encrypt #:cipher? 'tdes "chenxiao" "chensihehesichenchenhesi" #:operation_mode? 'ecb)
+     (encrypt #:cipher? 'tdes #:operation_mode? 'ecb
+              "chenxiao" "chensihehesichenchenhesi"
+              )
      "803B74B5ABD02C32")
 
     (check-equal?
