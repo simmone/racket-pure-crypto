@@ -176,7 +176,6 @@
                                  16))])))
                 (detail-line decrypted_block_data)
 
-                (detail-line "operated_decrypted_block_data:")
                 (set! operated_decrypted_block_data
                       (cond
                        [(eq? operation_mode? 'cbc)
@@ -197,7 +196,10 @@
                           (set! operation_next_factor pcbc_next_factor_binary)
 
                           pcbc_decrypted_binary_data)]
-                       [(or (eq? operation_mode? 'cfb) (eq? operation_mode? 'ofb))
+                       [(or
+                         (eq? operation_mode? 'cfb)
+                         (eq? operation_mode? 'ofb)
+                         (eq? operation_mode? 'ctr))
                         (let* ([count (string-length encrypted_block_data)]
                                [padding_before_xor (~a #:min-width block_bit_size #:right-pad-string "0" encrypted_block_data)]
                                [result
@@ -206,12 +208,24 @@
                                      (bitwise-xor (string->number decrypted_block_data 2) (string->number padding_before_xor 2)))
                                  0 count)])
 
-                          (if (eq? operation_mode? 'cfb)
-                              (set! operation_next_factor encrypted_block_data)
-                              (set! operation_next_factor decrypted_block_data))
+                          (cond
+                           [(eq? operation_mode? 'cfb)
+                            (set! operation_next_factor encrypted_block_data)]
+                           [(eq? operation_mode? 'ctr)
+                            (detail-line "ctr-counter:")
+                            (detail-line last_factor)
+                            (set! operation_next_factor
+                                  (~r #:min-width block_bit_size #:base 2 #:pad-string "0" (add1 (string->number last_factor 2))))
+                            (detail-line "ctr-next-counter:")
+                            (detail-line operation_next_factor)
+                            ]
+                           [else
+                            (set! operation_next_factor decrypted_block_data)])
                           result)]
                        [else
                         decrypted_block_data]))
+
+                (detail-line "operated_decrypted_block_data:")
                 (detail-line operated_decrypted_block_data)
 
                 (detail-line "operation_next_factor:")
@@ -225,8 +239,13 @@
               (let ([decrypted_data_hex_strs
                      (map
                       (lambda (binary_data)
-                        (string-upcase
-                         (~r #:base 16 #:min-width block_hex_size #:pad-string "0" (string->number binary_data 2))))
+                        (if (or
+                             (eq? operation_mode? 'cfb)
+                             (eq? operation_mode? 'ofb)
+                             (eq? operation_mode? 'ctr)
+                           )
+                            (~r #:base 16 (string->number binary_data 2))                            
+                            (~r #:base 16 #:min-width block_hex_size #:pad-string "0" (string->number binary_data 2))))
                       (reverse result_list))])
 
                 (detail-line "decrypted_data_hex_strs:")
