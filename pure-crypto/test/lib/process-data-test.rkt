@@ -15,7 +15,7 @@
 
     (let ([result
            (detail 
-            #:formats? '("process-data-64.pdf")
+            #:formats? #f
             (lambda ()
               (detail-page
                (lambda ()
@@ -25,7 +25,7 @@
 
     (let ([result
            (detail 
-            #:formats? '("process-data-128.pdf")
+            #:formats? #f
             (lambda ()
               (detail-page
                (lambda ()

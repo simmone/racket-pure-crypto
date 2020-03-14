@@ -34,7 +34,7 @@
      (decrypt #:cipher? 'tdes
       "2D61506C375C685E"
       "133457799BBCDFF1134357799BBCDFF1133547799BBCDFF1" #:data_format? 'hex #:key_format? 'hex #:operation_mode? 'ecb)
-      "0123456789ABCDEF")
+      "0123456789abcdef")
 
     (check-equal? 
      (decrypt #:cipher? 'tdes
@@ -141,7 +141,7 @@
 
     (check-equal?
      (decrypt #:cipher? 'tdes
-      "CA"
+      "ca"
       "chensihehesichenchenhesi" #:iv? "fffffffffffffff0" #:operation_mode? 'ofb)
       "a")
 

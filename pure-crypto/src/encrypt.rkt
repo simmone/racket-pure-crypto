@@ -230,7 +230,7 @@
                         (foldr string-append ""
                                (map
                                 (lambda (binary_data)
-                                  (string-upcase
+                                  (string-downcase
                                    (~r #:base 16 #:min-width (/ (string-length binary_data) 4) #:pad-string "0" (string->number binary_data 2))))
                                 encrypted_binary_data_list)))
                   (detail-line encrypted_data #:line_break_length? 16)

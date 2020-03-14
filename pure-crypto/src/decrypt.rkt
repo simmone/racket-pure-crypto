@@ -197,10 +197,10 @@
                           pcbc_decrypted_binary_data)]
                        [(or (eq? operation_mode? 'cfb) (eq? operation_mode? 'ofb))
                         (let* ([count (string-length encrypted_block_data)]
-                               [padding_before_xor (~a #:min-width 64 #:right-pad-string "0" encrypted_block_data)]
+                               [padding_before_xor (~a #:min-width block_bit_size #:right-pad-string "0" encrypted_block_data)]
                                [result
                                 (substring
-                                 (~r #:min-width 64 #:base 2 #:pad-string "0"
+                                 (~r #:min-width block_bit_size #:base 2 #:pad-string "0"
                                      (bitwise-xor (string->number decrypted_block_data 2) (string->number padding_before_xor 2)))
                                  0 count)])
 

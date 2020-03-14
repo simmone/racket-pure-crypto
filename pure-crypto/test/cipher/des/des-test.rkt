@@ -15,7 +15,7 @@
 
     (check-equal?
      (detail 
-      #:formats? '(console "des.pdf")
+      #:formats? #f
       (lambda ()
         (detail-page
          (lambda ()

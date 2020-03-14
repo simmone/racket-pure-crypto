@@ -4,7 +4,6 @@
 (require rackunit/text-ui)
 
 (require "../../../src/cipher/des/des-key-lists.rkt")
-
 (require "../../../../../racket-detail/detail/main.rkt")
 
 (define test-des-key-lists
@@ -16,7 +15,7 @@
 
     (let ([result
            (detail 
-            #:formats? '(console "des-key-lists.pdf")
+            #:formats? #f
             (lambda ()
               (detail-page
                (lambda ()
