@@ -222,8 +222,10 @@
     
     (check-equal?
      (decrypt #:cipher? 'aes #:operation_mode? 'ofb
-              "chenxiaoxiaochena" "chensihehesichen")
-     "D8308E159E56ED0B24811CE4DF1E0CDB54")
+              "D8308E159E56ED0B24811CE4DF1E0CDB54"
+              "chensihehesichen"
+              )
+     "chenxiaoxiaochena")
 
     (check-equal?
      (decrypt #:cipher? 'aes #:key_format? 'hex #:data_format? 'hex #:operation_mode? 'ofb

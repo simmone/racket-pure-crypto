@@ -100,7 +100,8 @@
     "test-cfb"
 
     (check-equal?
-     (encrypt #:cipher? 'tdes "a" "chensihehesichenchenhesi" #:iv? "fffffffffffffff0" #:operation_mode? 'cfb)
+     (encrypt #:cipher? 'tdes #:iv? "fffffffffffffff0" #:operation_mode? 'cfb #:detail? '("detail1.pdf")
+              "a" "chensihehesichenchenhesi")
      "ca")
 
     (check-equal?

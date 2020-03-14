@@ -22,7 +22,7 @@
                        #:data_format? (or/c 'hex 'base64 'utf-8)
                        #:encrypted_format? (or/c 'hex 'base64)
                        #:padding_mode? (or/c 'pkcs7 'zero 'no-padding 'ansix923 'iso10126)
-                       #:operation_mode? (or/c 'ecb 'cbc 'pcbc 'cfb 'ofb)
+                       #:operation_mode? (or/c 'ecb 'cbc 'pcbc 'cfb 'ofb 'ctr)
                        #:iv? string?
                        #:detail? (or/c #f (listof (or/c 'raw 'console path-string?)))
                       )
@@ -139,16 +139,18 @@
                 (set! decrypted_block_data
                       (if (or
                            (eq? operation_mode? 'cfb)
-                           (eq? operation_mode? 'ofb))
+                           (eq? operation_mode? 'ofb)
+                           (eq? operation_mode? 'ctr)
+                           )
                           (cond
                            [(eq? cipher? 'des)
                             (des last_factor (list-ref des_k_lists 0))]
                            [(eq? cipher? 'tdes)
-                            (let ([d1 #f]
-                                  [de2 #f])
-                              (set! d1 (undes last_factor (list-ref des_k_lists 2)))
-                              (set! de2 (des d1 (list-ref des_k_lists 1)))
-                              (undes de2 (list-ref des_k_lists 0)))]
+                            (let ([e1 #f]
+                                  [ed2 #f])
+                              (set! e1 (des last_factor (list-ref des_k_lists 0)))
+                              (set! ed2 (undes e1 (list-ref des_k_lists 1)))
+                              (des ed2 (list-ref des_k_lists 2)))]
                            [(eq? cipher? 'aes)
                             (~r #:base 2 #:min-width block_bit_size #:pad-string "0"
                                 (string->number
@@ -224,7 +226,7 @@
                      (map
                       (lambda (binary_data)
                         (string-upcase
-                         (~r #:base 16 #:min-width (/ (string-length binary_data) 4) #:pad-string "0" (string->number binary_data 2))))
+                         (~r #:base 16 #:min-width block_hex_size #:pad-string "0" (string->number binary_data 2))))
                       (reverse result_list))])
 
                 (detail-line "decrypted_data_hex_strs:")
@@ -235,6 +237,7 @@
                   (if (and
                        (not (eq? operation_mode? 'cfb))
                        (not (eq? operation_mode? 'ofb))
+                       (not (eq? operation_mode? 'ctr))
                        (= (string-length (last decrypted_data_hex_strs)) block_hex_size)
                        (not (eq? padding_mode? 'no-padding)))
                       (list-set decrypted_data_hex_strs
