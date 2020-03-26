@@ -12,7 +12,7 @@
 (require "cipher/des/des-key-lists.rkt")
 (require "cipher/aes/aes.rkt")
 
-(require "../../../racket-detail/detail/main.rkt")
+(require detail)
 
 (provide (contract-out
           [decrypt (->* (string? string?)

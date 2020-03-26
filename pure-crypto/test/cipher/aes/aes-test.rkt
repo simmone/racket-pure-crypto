@@ -4,7 +4,8 @@
 (require rackunit/text-ui)
 
 (require "../../../src/cipher/aes/aes.rkt")
-(require "../../../../../racket-detail/detail/main.rkt")
+
+(require detail)
 
 (define test-aes
   (test-suite

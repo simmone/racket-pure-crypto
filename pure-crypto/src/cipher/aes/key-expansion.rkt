@@ -3,7 +3,7 @@
 (require "lib.rkt")
 (require "s-box.rkt")
 
-(require "../../../../../racket-detail/detail/main.rkt")
+(require detail)
 
 (provide (contract-out
           [rcon (-> natural?

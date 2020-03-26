@@ -1,6 +1,6 @@
 #lang racket
 
-(require "../../../../../racket-detail/detail/main.rkt")
+(require detail)
 
 (require "s-box.rkt")
 (require "shift-rows.rkt")

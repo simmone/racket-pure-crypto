@@ -4,7 +4,8 @@
 (require rackunit/text-ui)
 
 (require "../../../src/cipher/des/des.rkt")
-(require "../../../../../racket-detail/detail/main.rkt")
+
+(require detail)
 
 (define test-des
   (test-suite

@@ -4,7 +4,8 @@
 (require rackunit/text-ui)
 
 (require "../../src/lib/process-data.rkt")
-(require "../../../../racket-detail/detail/main.rkt")
+
+(require detail)
 
 (define test-process-data
   (test-suite

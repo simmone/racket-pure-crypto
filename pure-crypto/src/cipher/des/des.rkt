@@ -16,7 +16,7 @@
                ]
           ))
 
-(require "../../../../../racket-detail/detail/main.rkt")
+(require detail)
 (require "../../lib/constants.rkt")
 (require "../../lib/lib.rkt")
 

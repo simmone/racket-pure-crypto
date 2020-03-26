@@ -9,7 +9,7 @@
 (require "cipher/des/des-key-lists.rkt")
 (require "cipher/aes/aes.rkt")
 
-(require "../../../racket-detail/detail/main.rkt")
+(require detail)
 
 (require file/sha1)
 (require net/base64)
