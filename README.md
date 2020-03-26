@@ -1,2 +1,8 @@
 # racket-pure-crypto
-a pure racket crypto implementation for encryption/decryption
+a pure racket implementation for crypto algorithms, now support DES/TDES/AES.
+
+
+
+
+
+
