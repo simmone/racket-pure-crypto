@@ -104,7 +104,7 @@
 
     (check-equal?
      (decrypt #:cipher? 'aes
-              "3C0AEADD704C4A2FF227CCB67C2F4F65"
+              "3c0aeadd704c4a2ff227ccb67c2f4f65"
               "chensihehesichen")
      "chenxiaoxiaochen")
 

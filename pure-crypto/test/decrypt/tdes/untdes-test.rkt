@@ -54,13 +54,13 @@
 
     (check-equal? 
      (decrypt #:cipher? 'tdes
-      "6AE1861FBD926B64"
+      "6ae1861fbd926b64"
       "chensihehesichenchenhesi" #:iv? "fffffffffffffff0" #:padding_mode? 'zero)
      "a")
 
     (check-equal? 
      (decrypt #:cipher? 'tdes
-      "E99DAFFBF097826E560E22D458A0A6B74E619B140E43A94F"
+      "e99daffbf097826e560e22d458a0a6b74e619b140e43a94f"
       "chensihechensihechensihe" #:iv? "0000000000000000")
       "chenxiaoxiaochenxichaoen")
 

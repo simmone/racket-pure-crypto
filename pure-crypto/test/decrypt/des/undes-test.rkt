@@ -37,7 +37,7 @@
 
     (check-equal? 
      (decrypt
-     "92165495EDA4824D"
+     "92165495eda4824d"
       "chensihe"
       #:operation_mode? 'ecb)
      "a"
