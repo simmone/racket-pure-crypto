@@ -31,14 +31,14 @@ raco pkg install pure-crypto
 @defproc[(encrypt
            [data string?]
            [key string?]
-           [#:cipher? (or/c 'des 'tdes 'aes) 'des]
-           [#:key_format? (or/c 'hex 'base64 'utf-8) 'utf-8]
-           [#:data_format? (or/c 'hex 'base64 'utf-8) 'utf-8]
-           [#:encrypted_format? (or/c 'hex 'base64) 'hex]
-           [#:padding_mode? (or/c 'pkcs7 'zero 'no-padding 'ansix923 'iso10126) 'pkcs7]
-           [#:operation_mode? (or/c 'ecb 'cbc 'pcbc 'cfb 'ofb 'ctr) 'cbc]
-           [#:iv? (or/c #f string?) #f]
-           [#:detail? (or/c #f (listof (or/c 'raw 'console path-string?))) #f]
+           [#:cipher? cipher? (or/c 'des 'tdes 'aes) 'des]
+           [#:key_format? key_format? (or/c 'hex 'base64 'utf-8) 'utf-8]
+           [#:data_format? data_format? (or/c 'hex 'base64 'utf-8) 'utf-8]
+           [#:encrypted_format? encrypted_format? (or/c 'hex 'base64) 'hex]
+           [#:padding_mode? padding_mode? (or/c 'pkcs7 'zero 'no-padding 'ansix923 'iso10126) 'pkcs7]
+           [#:operation_mode? operation_mode? (or/c 'ecb 'cbc 'pcbc 'cfb 'ofb 'ctr) 'cbc]
+           [#:iv? iv? (or/c #f string?) #f]
+           [#:detail? detail? (or/c #f (listof (or/c 'raw 'console path-string?))) #f]
          )
          (or/c #f string?)]{
 }
@@ -46,14 +46,14 @@ raco pkg install pure-crypto
 @defproc[(decrypt
            [data string?]
            [key string?]
-           [#:cipher? (or/c 'des 'tdes 'aes) 'des]
-           [#:key_format? (or/c 'hex 'base64 'utf-8) 'utf-8]
-           [#:data_format? (or/c 'hex 'base64 'utf-8) 'utf-8]
-           [#:encrypted_format? (or/c 'hex 'base64) 'hex]
-           [#:padding_mode? (or/c 'pkcs7 'zero 'no-padding 'ansix923 'iso10126) 'pkcs7]
-           [#:operation_mode? (or/c 'ecb 'cbc 'pcbc 'cfb 'ofb 'ctr) 'cbc]
-           [#:iv? (or/c #f string?) #f]
-           [#:detail? (or/c #f (listof (or/c 'raw 'console path-string?))) #f]
+           [#:cipher? cipher? (or/c 'des 'tdes 'aes) 'des]
+           [#:key_format? key_format? (or/c 'hex 'base64 'utf-8) 'utf-8]
+           [#:data_format? data_format? (or/c 'hex 'base64 'utf-8) 'utf-8]
+           [#:encrypted_format? encrypted_format? (or/c 'hex 'base64) 'hex]
+           [#:padding_mode? padding_mode? (or/c 'pkcs7 'zero 'no-padding 'ansix923 'iso10126) 'pkcs7]
+           [#:operation_mode? operation_mode? (or/c 'ecb 'cbc 'pcbc 'cfb 'ofb 'ctr) 'cbc]
+           [#:iv? iv? (or/c #f string?) #f]
+           [#:detail? detail? (or/c #f (listof (or/c 'raw 'console path-string?))) #f]
          )
          (or/c #f string?)]{
 }
