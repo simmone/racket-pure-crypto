@@ -3,7 +3,7 @@
 @(require (for-label racket))
 @(require (for-label pure-crypto))
 
-@title{pure-crypto: a pure crypto implementation for racket}
+@title{Pure-Crypto: a pure crypto implementation for racket}
 
 @author+email["Chen Xiao" "chenxiao770117@gmail.com"]
 
