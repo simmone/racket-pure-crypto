@@ -10,3 +10,5 @@
                "scribble-lib"
                "detail"
                ))
+
+(define test-omit-paths '("info.rkt"))
