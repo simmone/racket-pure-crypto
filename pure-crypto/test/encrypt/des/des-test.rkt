@@ -12,13 +12,17 @@
    (test-case
     "test-ecb"
 
-    (check-equal?
-     (encrypt "chenxiao" "陈晓陈晓陈晓" #:operation_mode? 'ecb)
-     #f)
+    (check-exn
+     exn:fail?
+     (lambda ()
+       (encrypt "chenxiao" "陈晓陈晓陈晓" #:operation_mode? 'ecb)))
+    ;; DES key length is invalid. expect 16/32/48(hex), but get 36
 
-    (check-equal?
-     (encrypt "0123456789ABCDEF" "133457799BBCDFF" #:operation_mode? 'ecb #:data_format? 'hex #:key_format? 'hex)
-     #f)
+    (check-exn
+     exn:fail?
+     (lambda ()
+       (encrypt "0123456789ABCDEF" "133457799BBCDFF" #:operation_mode? 'ecb #:data_format? 'hex #:key_format? 'hex)))
+    ;; DES key length is invalid. expect 16/32/48(hex), but get 15
 
     (check-equal? 
      (encrypt "chenxiao" "chensihe" #:operation_mode? 'ecb)

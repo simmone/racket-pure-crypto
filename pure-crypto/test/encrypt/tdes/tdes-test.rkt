@@ -12,13 +12,17 @@
    (test-case
     "test-ecb"
 
-    (check-equal?
-     (encrypt #:cipher? 'tdes "chenxiao" "陈晓陈晓陈晓" #:operation_mode? 'ecb)
-     #f)
+    (check-exn
+     exn:fail?
+     (lambda ()
+       (encrypt #:cipher? 'tdes "chenxiao" "陈晓陈晓陈晓" #:operation_mode? 'ecb)))
+    ;; DES key length is invalid. expect 16/32/48(hex), but get 36
 
-    (check-equal?
-     (encrypt #:cipher? 'tdes "0123456789ABCDEF" "133457799BBCDFF" #:operation_mode? 'ecb #:data_format? 'hex #:key_format? 'hex)
-     #f)
+    (check-exn
+     exn:fail?
+     (lambda ()
+       (encrypt #:cipher? 'tdes "0123456789ABCDEF" "133457799BBCDFF" #:operation_mode? 'ecb #:data_format? 'hex #:key_format? 'hex)))
+    ;; iv should be in 16 hex format.
 
     (check-equal? 
      (encrypt #:cipher? 'tdes #:operation_mode? 'ecb
@@ -51,9 +55,11 @@
    (test-case
     "test-cbc"
 
-    (check-equal?
-     (encrypt #:cipher? 'tdes "a" "chensihehesichenchenhesi" #:iv? "000000000000000")
-     #f)
+    (check-exn
+     exn:fail?
+     (lambda ()
+       (encrypt #:cipher? 'tdes "a" "chensihehesichenchenhesi" #:iv? "000000000000000")))
+    ;; iv should be in 16 hex format.
 
     (check-equal? 
      (encrypt #:cipher? 'tdes "a" "chensihehesichenchenhesi")
@@ -100,7 +106,7 @@
     "test-cfb"
 
     (check-equal?
-     (encrypt #:cipher? 'tdes #:iv? "fffffffffffffff0" #:operation_mode? 'cfb #:detail? '("detail1.pdf")
+     (encrypt #:cipher? 'tdes #:iv? "fffffffffffffff0" #:operation_mode? 'cfb
               "a" "chensihehesichenchenhesi")
      "ca")
 

@@ -1,7 +1,5 @@
 #lang racket
 
-(require detail)
-
 (require "s-box.rkt")
 (require "shift-rows.rkt")
 (require "key-expansion.rkt")
@@ -22,188 +20,85 @@
           ))
 
 (define (aes block key)
-  (detail-div
-   #:font_size? 'small
-   (lambda ()
-     (let ([nb 4]
-           [nk #f]
-           [nr #f]
-           [key_size (string-length key)])
+  (let ([nb 4]
+        [nk #f]
+        [nr #f]
+        [key_size (string-length key)])
 
-       (detail-h1 "AES Encryption")
-          
-       (detail-h2 "Input")
-          
-       (detail-list
-        (lambda ()
-          (detail-row (lambda () (detail-col "block data:") (detail-col block)))
-          
-          (detail-row (lambda () (detail-col "key:") (detail-col key)))
+    (cond
+     [(= key_size 32)
+      (set! nk 4)
+      (set! nr 10)]
+     [(= key_size 48)
+      (set! nk 6)
+      (set! nr 12)]
+     [(= key_size 64)
+      (set! nk 8)
+      (set! nr 14)])
+    
+    (let ([w (key-expansion key nk nr)]
+          [state block])
 
-          (cond
-           [(= key_size 32)
-            (set! nk 4)
-            (set! nr 10)]
-           [(= key_size 48)
-            (set! nk 6)
-            (set! nr 12)]
-           [(= key_size 64)
-            (set! nk 8)
-            (set! nr 14)])
-          
-          (detail-row (lambda () (detail-col "key size:") (detail-col (number->string key_size))))
+      (set! state (add-round-key state (list-ref w 0)))
+      
+      (let loop ([round 1])
+        (when (<= round (sub1 nr))
+          (set! state (sub-block state))
 
-          (detail-row (lambda () (detail-col "nk:") (detail-col (number->string nk))))
+          (set! state (shift-rows state))
 
-          (detail-row (lambda () (detail-col "nr:") (detail-col (number->string nr))))))
-       
-       (let ([w (key-expansion key nk nr)]
-             [state block])
+          (set! state (mix-columns state))
 
-         (detail-h2 "Cipher Start")
+          (set! state (add-round-key state (list-ref w round)))
 
-         (detail-list
-          (lambda ()
-            (detail-row (lambda () (detail-col "round[0].input: ") (detail-col state)))
+          (loop (add1 round))))
 
-            (detail-row (lambda () (detail-col "round[0].k_sch") (detail-col (list-ref w 0))))
+      (set! state (sub-block state))
 
-            (set! state (add-round-key state (list-ref w 0)))
-            
-            (let loop ([round 1])
-              (when (<= round (sub1 nr))
-                (detail-row (lambda () (detail-col (format "round[~a].start" round)) (detail-col state)))
+      (set! state (shift-rows state))
 
-                (set! state (sub-block state))
+      (set! state (add-round-key state (list-ref w nr)))
 
-                (detail-row (lambda () (detail-col (format "round[~a].s_box" round)) (detail-col state)))
-                
-                (set! state (shift-rows state))
-
-                (detail-row (lambda () (detail-col (format "round[~a].s_row" round)) (detail-col state)))
-                
-                (set! state (mix-columns state))
-
-                (detail-row (lambda () (detail-col (format "round[~a].m_col" round)) (detail-col state)))
-
-                (set! state (add-round-key state (list-ref w round)))
-
-                (detail-row (lambda () (detail-col (format "round[~a].k_sch" round)) (detail-col (list-ref w round))))
-                
-                (loop (add1 round))))
-
-            (set! state (sub-block state))
-
-            (detail-row (lambda () (detail-col (format "round[~a].s_box" nr)) (detail-col state)))
-
-            (set! state (shift-rows state))
-
-            (detail-row (lambda () (detail-col (format "round[~a].s_row" nr)) (detail-col state)))
-
-            (set! state (add-round-key state (list-ref w nr)))
-
-            (detail-row (lambda () (detail-col (format "round[~a].k_sch" nr)) (detail-col (list-ref w nr))))
-
-            (detail-row (lambda () (detail-col (format "round[~a].output" nr)) (detail-col state)))
-            ))
-
-         (detail-h2 "Cipher End")
-            
-         (detail-line state #:font_size? 'big #:line_break_length? 32)
-         
-         state)))))
+      state)))
 
 (define (unaes block key)
-  (detail-div 
-   #:font_size? 'small
-   (lambda ()
+  (let ([nb 4]
+        [nk #f]
+        [nr #f]
+        [key_size (string-length key)])
 
-     (let ([nb 4]
-           [nk #f]
-           [nr #f]
-           [key_size (string-length key)])
+    (cond
+     [(= key_size 32)
+      (set! nk 4)
+      (set! nr 10)]
+     [(= key_size 48)
+      (set! nk 6)
+      (set! nr 12)]
+     [(= key_size 64)
+      (set! nk 8)
+      (set! nr 14)])
 
-       (detail-h1 "AES Decryption")
-          
-       (detail-h2 "Input")
-          
-       (detail-list
-        (lambda ()
-          (detail-row (lambda () (detail-col "block data:") (detail-col block)))
+    (let ([w (key-expansion key nk nr)]
+          [state block])
 
-          (detail-row (lambda () (detail-col "key:") (detail-col key)))
+      (set! state (add-round-key state (list-ref w nr)))
 
-          (cond
-           [(= key_size 32)
-            (set! nk 4)
-            (set! nr 10)]
-           [(= key_size 48)
-            (set! nk 6)
-            (set! nr 12)]
-           [(= key_size 64)
-            (set! nk 8)
-            (set! nr 14)])
-          
-          (detail-row (lambda () (detail-col "key size:") (detail-col (number->string key_size))))
+      (let loop ([round 1])
+        (when (<= round (sub1 nr))
+          (set! state (inv-shift-rows state))
 
-          (detail-row (lambda () (detail-col "nk:") (detail-col (number->string nk))))
+          (set! state (inv-sub-block state))
 
-          (detail-row (lambda () (detail-col "nr:") (detail-col (number->string nr))))))
-       
-       (let ([w (key-expansion key nk nr)]
-             [state block])
+          (set! state (add-round-key state (list-ref w (- nr round))))
 
-         (detail-h2 "InvCipher Start")
+          (set! state (inv-mix-columns state))
 
-         (detail-list
-          (lambda ()
-            (detail-row (lambda () (detail-col "round[0].iinput: ") (detail-col state)))
+          (loop (add1 round))))
 
-            (detail-row (lambda () (detail-col "round[0].ik_sch") (detail-col (list-ref w nr))))
+      (set! state (inv-shift-rows state))
 
-            (set! state (add-round-key state (list-ref w nr)))
+      (set! state (inv-sub-block state))
 
-            (let loop ([round 1])
-              (when (<= round (sub1 nr))
-                (detail-row (lambda () (detail-col (format "round[~a].istart" round)) (detail-col state)))
+      (set! state (add-round-key state (list-ref w 0)))
 
-                (set! state (inv-shift-rows state))
-
-                (detail-row (lambda () (detail-col (format "round[~a].is_row" round)) (detail-col state)))
-
-                (set! state (inv-sub-block state))
-
-                (detail-row (lambda () (detail-col (format "round[~a].is_box" round)) (detail-col state)))
-
-                (detail-row (lambda () (detail-col (format "round[~a].ik_sch" round)) (detail-col (list-ref w (- nr round)))))
-
-                (set! state (add-round-key state (list-ref w (- nr round))))
-
-                (detail-row (lambda () (detail-col (format "round[~a].ik_add" round)) (detail-col state)))
-                
-                (set! state (inv-mix-columns state))
-
-                (loop (add1 round))))
-
-            (set! state (inv-shift-rows state))
-
-            (detail-row (lambda () (detail-col (format "round[~a].is_row" nr)) (detail-col state)))
-
-            (set! state (inv-sub-block state))
-
-            (detail-row (lambda () (detail-col (format "round[~a].is_box" nr)) (detail-col state)))
-
-            (set! state (add-round-key state (list-ref w 0)))
-
-            (detail-row (lambda () (detail-col (format "round[~a].ik_sch" nr)) (detail-col (list-ref w 0))))
-
-            (detail-row (lambda () (detail-col (format "round[~a].output" nr)) (detail-col state)))
-            ))
-
-         (detail-h2 "InvCipher End")
-            
-         (detail-line state #:font_size? 'big #:line_break_length? 32)
-         
-         state)))))
-
-
+      state)))

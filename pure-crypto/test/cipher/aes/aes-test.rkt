@@ -5,8 +5,6 @@
 
 (require "../../../src/cipher/aes/aes.rkt")
 
-(require detail)
-
 (define test-aes
   (test-suite
    "test-aes"
@@ -15,13 +13,8 @@
     "test-aes-128"
 
     (check-equal? 
-     (detail 
-      #:formats? #f
-      (lambda ()
-        (detail-page
-         (lambda ()
-           (aes "00112233445566778899aabbccddeeff"
-                "000102030405060708090a0b0c0d0e0f")))))
+     (aes "00112233445566778899aabbccddeeff"
+          "000102030405060708090a0b0c0d0e0f")
      "69c4e0d86a7b0430d8cdb78070b4c55a")
 
     (check-equal? 

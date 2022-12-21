@@ -11,7 +11,6 @@
                "rackunit-lib"
                "racket-doc"
                "scribble-lib"
-               "detail"
                ))
 
 (define test-omit-paths '("info.rkt"))
